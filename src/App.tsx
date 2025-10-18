@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import BookingsPage from './pages/BookingsPage';
+import ListingsPage from './pages/ListingsPage';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/listings" element={<ListingsPage />} />
           <Route path="/dashboard/:role" element={<Dashboard />} />
           <Route path="/dashboard/:role/bookings" element={<BookingsPage />} />
           <Route
