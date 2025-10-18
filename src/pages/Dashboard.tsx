@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { getBookings } from '../utils/storage';
 import { mockListings } from '../data/mockData';
 import { Booking } from '../types';
 import OwnerDashboard from '../components/dashboard/OwnerDashboard';
 import StudentDashboard from '../components/dashboard/StudentDashboard';
+import DashboardLayout from '../components/dashboard/DashboardLayout';
 
 const Dashboard: React.FC = () => {
-  const { role } = useParams();
+  const { role } = useParams<{ role: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -31,28 +31,16 @@ const Dashboard: React.FC = () => {
     }
   }, [user, role, navigate]);
 
-  if (!user) return null;
+  if (!user || !role) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar role={role || ''} />
-
-      <main className="ml-64">
-        <header className="flex items-center justify-between h-16 px-8 border-b border-border">
-            <h1 className="text-xl font-semibold">Dashboard</h1>
-            <div className="text-sm text-foreground-muted">
-                {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </div>
-        </header>
-        <div className="p-8">
-          {user.role === 'student' ? (
-            <StudentDashboard user={user} bookings={bookings} />
-          ) : (
-            <OwnerDashboard user={user} bookings={bookings} />
-          )}
-        </div>
-      </main>
-    </div>
+    <DashboardLayout role={role} pageTitle="Dashboard">
+      {user.role === 'student' ? (
+        <StudentDashboard user={user} bookings={bookings} />
+      ) : (
+        <OwnerDashboard user={user} bookings={bookings} />
+      )}
+    </DashboardLayout>
   );
 };
 

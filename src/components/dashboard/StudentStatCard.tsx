@@ -10,12 +10,12 @@ interface StudentStatCardProps {
 
 const StudentStatCard: React.FC<StudentStatCardProps> = ({ title, value, icon: Icon, color }) => {
   return (
-    <div className="bg-surface rounded-xl p-5 border border-border flex items-center space-x-4">
-      <div className="p-3 rounded-lg bg-background">
+    <div className="bg-background rounded-xl p-5 border border-border flex items-center space-x-4 shadow-sm">
+      <div className="p-3 rounded-lg bg-surface">
         <Icon className={`w-6 h-6 ${color}`} />
       </div>
       <div>
-        <p className="text-foreground-muted text-sm">{title}</p>
+        <p className="text-foreground-muted text-sm font-medium">{title}</p>
         <p className="text-2xl font-bold text-foreground-default">{value}</p>
       </div>
     </div>

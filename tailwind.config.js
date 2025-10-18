@@ -2,21 +2,26 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{js,jsx,ts,tsx}', './index.html'],
   theme: {
     extend: {
       colors: {
-        background: '#0D1117',
-        surface: '#161B22',
-        primary: '#58A6FF',
-        secondary: '#8B5CF6',
-        border: '#30363D',
-        'foreground-default': '#C9D1D9',
-        'foreground-muted': '#8B949E',
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        primary: 'var(--color-primary)',
+        accent: 'var(--color-accent)',
+        border: 'var(--color-border)',
+        'foreground-default': 'var(--color-foreground-default)',
+        'foreground-muted': 'var(--color-foreground-muted)',
       },
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
       },
+      boxShadow: {
+        'subtle': '0 4px 12px rgba(0, 0, 0, 0.05)',
+        'md-deep': '0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+      }
     },
   },
   plugins: [],

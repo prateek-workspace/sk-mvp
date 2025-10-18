@@ -10,8 +10,7 @@ import {
   ShieldCheck,
   CalendarCheck,
   Star,
-  GitCompareArrows,
-  Bookmark,
+  ChevronRight,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ListingCard from '../components/ListingCard';
@@ -22,14 +21,14 @@ import { useAuth } from '../context/AuthContext';
 import { saveBooking } from '../utils/storage';
 
 const TestimonialCard: React.FC<{ review: Review }> = ({ review }) => (
-  <div className="bg-surface p-6 rounded-xl border border-border h-full flex flex-col">
+  <div className="bg-background p-6 rounded-xl border border-border h-full flex flex-col shadow-subtle">
     <div className="flex items-center mb-4">
       <img src={review.avatar} alt={review.author} className="w-12 h-12 rounded-full mr-4" />
       <div>
         <h4 className="font-semibold text-foreground-default">{review.author}</h4>
         <div className="flex">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
+            <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-yellow-500 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'}`} />
           ))}
         </div>
       </div>
@@ -82,35 +81,17 @@ const LandingPage: React.FC = () => {
     {
       icon: ShieldCheck,
       title: 'Verified Listings',
-      description: 'Every service on our platform is carefully vetted for quality, safety, and reliability, so you can choose with confidence.',
+      description: 'Every service is vetted for quality and safety, so you can choose with confidence.',
     },
     {
       icon: CalendarCheck,
       title: 'Seamless Booking',
-      description: 'Book your spot in just a few clicks. Get instant confirmations and manage all your bookings from one simple dashboard.',
+      description: 'Book your spot in just a few clicks and manage everything from one simple dashboard.',
     },
     {
       icon: Star,
       title: 'Genuine Reviews',
-      description: 'Make informed decisions with thousands of genuine reviews and ratings from a community of students just like you.',
-    },
-  ];
-
-  const howItWorksSteps = [
-    {
-      icon: Search,
-      title: '1. Search & Discover',
-      description: 'Use our powerful search to find services by category, location, and rating.',
-    },
-    {
-      icon: GitCompareArrows,
-      title: '2. Compare & Decide',
-      description: 'Easily compare features, prices, and student reviews to find your perfect match.',
-    },
-    {
-      icon: Bookmark,
-      title: '3. Book & Secure',
-      description: 'Secure your service directly through our platform with a simple and safe booking process.',
+      description: 'Make informed decisions with thousands of genuine reviews from students like you.',
     },
   ];
 
@@ -120,52 +101,44 @@ const LandingPage: React.FC = () => {
       <ListingDetailsModal listing={selectedListing} onClose={() => setSelectedListing(null)} onBook={handleBookNow} />
       
       {showBookingConfirm && (
-        <div className="fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div className="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
           Booking request sent successfully!
         </div>
       )}
 
-      <main>
-        <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 text-center">
+      <main className="pt-20">
+        <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground-default">
-              Your All-in-One Hub for <span className="text-primary">Student Success.</span>
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight text-foreground-default">
+              Find Your Focus. Fuel Your Future.
             </h1>
-            <p className="text-xl text-foreground-muted mb-10 max-w-3xl mx-auto">
-              Discover top-rated coaching, comfortable hostels, quality tiffin services, and quiet libraries. Everything you need to ace your exams is right here.
+            <p className="text-lg text-foreground-muted mb-10 max-w-3xl mx-auto">
+              The best student services, all in one place. Discover top-rated coaching, comfortable hostels, quality tiffin, and quiet libraries.
             </p>
 
             <div className="max-w-2xl mx-auto">
-              <div className="relative">
+              <div className="relative shadow-md-deep rounded-full">
                 <input
                   type="text"
-                  placeholder="Search for your-dream-service..."
-                  className="w-full pl-6 pr-28 py-4 bg-surface border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Search for coaching, PGs, tiffin..."
+                  className="w-full pl-6 pr-32 py-4 bg-background border border-border rounded-full text-foreground-default placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-                <button className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-primary text-white rounded-md font-medium hover:opacity-90 transition-opacity">
+                <button className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2.5 bg-primary text-white rounded-full font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
                   <Search className="w-5 h-5" />
+                  <span>Search</span>
                 </button>
               </div>
             </div>
           </motion.div>
         </section>
         
-        <section className="py-20 bg-surface border-y border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl font-bold text-foreground-default">Why Student Prep Hub?</h2>
-              <p className="text-lg text-foreground-muted mt-2">The ultimate toolkit for your preparation journey.</p>
-            </motion.div>
-            <div className="grid md:grid-cols-3 gap-8">
+        <section className="py-20 bg-surface">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-3 gap-12">
               {whyChooseUsFeatures.map((feature, idx) => (
                 <motion.div
                   key={idx}
@@ -175,7 +148,7 @@ const LandingPage: React.FC = () => {
                   transition={{ delay: idx * 0.1 }}
                   className="text-center p-6"
                 >
-                  <div className="flex items-center justify-center w-16 h-16 bg-background rounded-full mx-auto mb-4 border border-border">
+                  <div className="flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full mx-auto mb-4">
                     <feature.icon className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground-default mb-2">{feature.title}</h3>
@@ -186,42 +159,52 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="py-20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl font-bold text-foreground-default">Get Started in 3 Easy Steps</h2>
-            </motion.div>
-            <div className="relative flex justify-center">
-              <div className="absolute left-1/2 top-8 h-full w-px bg-border hidden md:block" aria-hidden="true"></div>
-              <div className="grid md:grid-cols-3 gap-12 max-w-4xl">
-                {howItWorksSteps.map((step, idx) => (
+        <section className="py-24 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-screen-xl mx-auto">
+            {categories.map((category) => {
+              const categoryListings = mockListings.filter((l) => l.type === category.id);
+              return (
+                <section key={category.id} id={category.id} className="mb-20">
                   <motion.div
-                    key={idx}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="flex flex-col items-center text-center"
+                    viewport={{ once: true, amount: 0.3 }}
+                    className="mb-8"
                   >
-                    <div className="flex items-center justify-center w-16 h-16 bg-surface rounded-full mb-4 border-2 border-primary z-10">
-                      <step.icon className="w-8 h-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-foreground-default mb-2">{step.title}</h3>
-                    <p className="text-foreground-muted">{step.description}</p>
+                    <h2 className="text-3xl font-bold text-foreground-default">{category.title}</h2>
+                    <p className="text-foreground-muted mt-1">Handpicked selections for you.</p>
                   </motion.div>
-                ))}
-              </div>
-            </div>
+
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+                    {categoryListings.slice(0, 4).map((listing, idx) => (
+                      <motion.div
+                        key={listing.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.05 }}
+                      >
+                        <ListingCard listing={listing} onViewDetails={handleViewDetails} />
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div className="mt-8">
+                    <Link
+                      to={`/listings?category=${category.id}`}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-background text-foreground-default border border-border rounded-lg text-sm font-semibold hover:bg-surface transition-colors shadow-sm"
+                    >
+                      Show all {category.title}
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </section>
+              );
+            })}
           </div>
         </section>
 
-        <section className="py-20 bg-surface border-y border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-surface">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -229,7 +212,6 @@ const LandingPage: React.FC = () => {
               className="text-center mb-12"
             >
               <h2 className="text-3xl font-bold text-foreground-default">What Our Students Say</h2>
-              <p className="text-lg text-foreground-muted mt-2">Real stories from students who found their perfect fit.</p>
             </motion.div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {mockReviews.slice(0, 3).map((review, idx) => (
@@ -246,73 +228,10 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
         </section>
-
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            {categories.map((category) => {
-              const categoryListings = mockListings.filter((l) => l.type === category.id);
-              return (
-                <section key={category.id} id={category.id} className="mb-20">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="mb-8 flex justify-between items-center"
-                  >
-                    <h2 className="text-3xl font-bold text-foreground-default">{category.title}</h2>
-                    <Link
-                      to={`/listings?category=${category.id}`}
-                      className="px-4 py-2 bg-surface text-primary border border-border rounded-lg text-sm font-semibold hover:bg-primary/10 transition-colors"
-                    >
-                      View All
-                    </Link>
-                  </motion.div>
-
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {categoryListings.slice(0, 3).map((listing, idx) => (
-                      <motion.div
-                        key={listing.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: idx * 0.05 }}
-                      >
-                        <ListingCard listing={listing} onViewDetails={handleViewDetails} />
-                      </motion.div>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="py-20">
-          <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl font-bold text-foreground-default mb-4">Ready to Find Your Perfect Fit?</h2>
-            <p className="text-lg text-foreground-muted mb-8">
-              Join thousands of students who have simplified their preparation journey. Explore listings or create an account to get started.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Link
-                to="#coaching"
-                className="px-8 py-3 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Explore Listings
-              </Link>
-              <Link
-                to="/login"
-                className="px-8 py-3 bg-surface text-foreground-default border border-border rounded-lg font-semibold hover:bg-white/5 transition-colors"
-              >
-                Create Account
-              </Link>
-            </div>
-          </div>
-        </section>
       </main>
 
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center">
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border mt-10">
+        <div className="max-w-screen-xl mx-auto text-center">
           <p className="text-foreground-muted">
             © 2025 Student Prep Hub. All rights reserved.
           </p>

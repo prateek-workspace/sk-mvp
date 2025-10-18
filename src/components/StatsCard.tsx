@@ -1,5 +1,5 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, ArrowUp, ArrowDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface StatsCardProps {
@@ -20,10 +20,10 @@ const StatsCard: React.FC<StatsCardProps> = ({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="bg-surface rounded-xl p-5 border border-border"
+      className="bg-background rounded-xl p-5 border border-border shadow-sm"
     >
       <div className="flex items-center justify-between mb-4">
-        <p className="text-foreground-muted text-sm">{title}</p>
+        <p className="text-foreground-muted text-sm font-medium">{title}</p>
         <Icon className="w-5 h-5 text-foreground-muted" />
       </div>
 
@@ -31,14 +31,14 @@ const StatsCard: React.FC<StatsCardProps> = ({
 
       <div className="flex items-center text-sm">
         <span
-          className={`font-medium ${
-            isPositive ? 'text-green-400' : 'text-red-400'
+          className={`flex items-center font-semibold ${
+            isPositive ? 'text-green-600' : 'text-red-600'
           }`}
         >
-          {isPositive ? '+' : ''}
-          {change}%
+          {isPositive ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" />}
+          {Math.abs(change)}%
         </span>
-        <span className="text-foreground-muted ml-2">from last month</span>
+        <span className="text-foreground-muted ml-2">vs last month</span>
       </div>
     </motion.div>
   );

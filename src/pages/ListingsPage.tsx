@@ -10,7 +10,7 @@ import { Listing } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { saveBooking } from '../utils/storage';
 
-const LISTINGS_PER_PAGE = 9;
+const LISTINGS_PER_PAGE = 8;
 
 const ListingsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -90,13 +90,13 @@ const ListingsPage: React.FC = () => {
       <ListingDetailsModal listing={selectedListing} onClose={() => setSelectedListing(null)} onBook={handleBookNow} />
       
       {showBookingConfirm && (
-        <div className="fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div className="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
           Booking request sent successfully!
         </div>
       )}
 
-      <main className="pt-24 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <main className="pt-28 pb-20">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -105,13 +105,13 @@ const ListingsPage: React.FC = () => {
           >
             <h1 className="text-4xl font-bold text-foreground-default">{getPageTitle()}</h1>
             <p className="text-lg text-foreground-muted mt-2">
-              Showing {currentListings.length} of {filteredListings.length} results.
+              Showing {filteredListings.length} results.
             </p>
           </motion.div>
 
           {currentListings.length > 0 ? (
             <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
                 {currentListings.map((listing, idx) => (
                   <motion.div
                     key={listing.id}
@@ -135,7 +135,7 @@ const ListingsPage: React.FC = () => {
       </main>
 
       <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-screen-xl mx-auto text-center">
           <p className="text-foreground-muted">
             © 2025 Student Prep Hub. All rights reserved.
           </p>
