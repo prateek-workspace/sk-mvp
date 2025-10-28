@@ -68,6 +68,21 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                     </ul>
                   </div>
 
+                  {listing.type === 'coaching' && listing.faculty && listing.faculty.length > 0 && (
+                    <div className="mb-8">
+                      <h4 className="font-semibold text-lg text-foreground-default mb-6 pb-2 border-b border-border">Meet The Faculty</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {listing.faculty.map((teacher, i) => (
+                          <div key={i} className="text-center flex flex-col items-center">
+                            <img src={teacher.image} alt={teacher.name} className="w-24 h-24 rounded-full mx-auto mb-3 object-cover shadow-md border-2 border-surface" />
+                            <p className="font-semibold text-foreground-default">{teacher.name}</p>
+                            <p className="text-sm text-primary font-medium">{teacher.subject}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <h4 className="font-semibold text-lg text-foreground-default mb-4 pb-2 border-b border-border">Reviews ({listing.reviews.length})</h4>
                     {listing.reviews.length > 0 ? (
@@ -102,7 +117,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                     </div>
                     <button
                       onClick={() => onBook(listing)}
-                      className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                      className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
                     >
                       Book Now
                     </button>

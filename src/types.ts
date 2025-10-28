@@ -19,6 +19,12 @@ export interface Review {
   date: string;
 }
 
+export interface Faculty {
+  name: string;
+  subject: string;
+  image: string;
+}
+
 export interface Listing {
   id: string;
   ownerId: string;
@@ -31,6 +37,7 @@ export interface Listing {
   image: string;
   features: string[];
   reviews: Review[];
+  faculty?: Faculty[];
 }
 
 export interface Booking {

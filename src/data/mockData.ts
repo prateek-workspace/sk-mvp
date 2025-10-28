@@ -1,4 +1,4 @@
-import { User, Listing, Review } from '../types';
+import { User, Listing, Review, Faculty } from '../types';
 
 export const mockReviews: Review[] = [
   {
@@ -95,37 +95,32 @@ export const mockUsers: User[] = [
   {
     id: '1',
     email: 'student@test.com',
-    password: 'test123',
+    full_name: 'Rahul Sharma',
     role: 'student',
-    name: 'Rahul Sharma',
   },
   {
     id: '2',
     email: 'coaching@test.com',
-    password: 'test123',
+    full_name: 'Aakash Institute',
     role: 'coaching',
-    name: 'Aakash Institute',
   },
   {
     id: '3',
     email: 'library@test.com',
-    password: 'test123',
+    full_name: 'Knowledge Hub Library',
     role: 'library',
-    name: 'Knowledge Hub Library',
   },
   {
     id: '4',
     email: 'pg@test.com',
-    password: 'test123',
+    full_name: 'Comfort PG',
     role: 'pg',
-    name: 'Comfort PG',
   },
   {
     id: '5',
     email: 'tiffin@test.com',
-    password: 'test123',
+    full_name: 'Homely Tiffin Service',
     role: 'tiffin',
-    name: 'Homely Tiffin Service',
   },
 ];
 
@@ -142,6 +137,11 @@ export const mockListings: Listing[] = [
     image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop',
     features: ['Expert Faculty', 'Study Material', 'Test Series', 'Doubt Sessions'],
     reviews: [mockReviews[0], mockReviews[1]],
+    faculty: [
+        { name: 'Dr. R.K. Verma', subject: 'Physics', image: 'https://i.pravatar.cc/150?img=12' },
+        { name: 'Prof. S.K. Singh', subject: 'Chemistry', image: 'https://i.pravatar.cc/150?img=13' },
+        { name: 'Dr. Anjali Sharma', subject: 'Biology', image: 'https://i.pravatar.cc/150?img=14' },
+    ]
   },
   {
     id: 'c2',
@@ -155,6 +155,11 @@ export const mockListings: Listing[] = [
     image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop',
     features: ['Live Classes', 'Mock Tests', '24/7 Support', 'Hostel Facility'],
     reviews: [mockReviews[0], mockReviews[1], mockReviews[2]],
+    faculty: [
+        { name: 'Mr. V.K. Bansal', subject: 'Mathematics', image: 'https://i.pravatar.cc/150?img=15' },
+        { name: 'Mrs. Deepa Kumar', subject: 'Physics', image: 'https://i.pravatar.cc/150?img=16' },
+        { name: 'Mr. Alok Gupta', subject: 'Chemistry', image: 'https://i.pravatar.cc/150?img=17' },
+    ]
   },
   {
     id: 'c3',
@@ -168,6 +173,11 @@ export const mockListings: Listing[] = [
     image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop',
     features: ['Current Affairs', 'Answer Writing', 'Interview Guidance', 'Library Access'],
     reviews: [mockReviews[1]],
+    faculty: [
+        { name: 'Mr. Ravi Kumar', subject: 'History & Polity', image: 'https://i.pravatar.cc/150?img=18' },
+        { name: 'Ms. Sunita Jain', subject: 'Economy', image: 'https://i.pravatar.cc/150?img=19' },
+        { name: 'Dr. A. P. Singh', subject: 'Ethics & Essay', image: 'https://i.pravatar.cc/150?img=20' },
+    ]
   },
   {
     id: 'c4',
@@ -181,6 +191,10 @@ export const mockListings: Listing[] = [
     image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=600&h=400&fit=crop',
     features: ['Daily Newspaper Analysis', 'Essay Writing Practice', 'Personality Test Prep', 'Small Batch Size'],
     reviews: [mockReviews[0]],
+    faculty: [
+        { name: 'Mr. Ankit Tiwari', subject: 'Current Affairs', image: 'https://i.pravatar.cc/150?img=21' },
+        { name: 'Mrs. Pooja Mehra', subject: 'Geography', image: 'https://i.pravatar.cc/150?img=22' },
+    ]
   },
   {
     id: 'c5',
@@ -194,6 +208,11 @@ export const mockListings: Listing[] = [
     image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=400&fit=crop',
     features: ['AIMCAT Test Series', 'GD/PI/WAT Training', 'Video Lectures', 'Doubt Clarification'],
     reviews: [mockReviews[9]],
+    faculty: [
+        { name: 'Mr. Rajesh Balasubramanian', subject: 'Quantitative Aptitude', image: 'https://i.pravatar.cc/150?img=23' },
+        { name: 'Ms. Ritu Singh', subject: 'Verbal Ability', image: 'https://i.pravatar.cc/150?img=24' },
+        { name: 'Mr. Sandeep Manudhane', subject: 'DI & LR', image: 'https://i.pravatar.cc/150?img=25' },
+    ]
   },
   {
     id: 'c6',
@@ -207,6 +226,10 @@ export const mockListings: Listing[] = [
     image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop',
     features: ['Experienced Faculty', 'Comprehensive Material', 'Online Test Series', 'Interview Guidance'],
     reviews: [mockReviews[6]],
+    faculty: [
+        { name: 'Mr. B. Singh', subject: 'Civil Engineering', image: 'https://i.pravatar.cc/150?img=26' },
+        { name: 'Mr. A. K. Gupta', subject: 'Mechanical Engineering', image: 'https://i.pravatar.cc/150?img=27' },
+    ]
   },
   {
     id: 'l1',
