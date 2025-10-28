@@ -1,7 +1,8 @@
 import { Booking } from '../types';
 
 const BOOKINGS_KEY = 'student_prep_hub_bookings';
-const AUTH_KEY = 'student_prep_hub_auth';
+
+// NOTE: Auth functions have been removed as Supabase now handles sessions.
 
 export const getBookings = (): Booking[] => {
   const data = localStorage.getItem(BOOKINGS_KEY);
@@ -23,17 +24,4 @@ export const updateBookingStatus = (
     b.id === bookingId ? { ...b, status } : b
   );
   localStorage.setItem(BOOKINGS_KEY, JSON.stringify(updatedBookings));
-};
-
-export const getCurrentUser = () => {
-  const data = localStorage.getItem(AUTH_KEY);
-  return data ? JSON.parse(data) : null;
-};
-
-export const setCurrentUser = (user: any) => {
-  localStorage.setItem(AUTH_KEY, JSON.stringify(user));
-};
-
-export const logout = () => {
-  localStorage.removeItem(AUTH_KEY);
 };

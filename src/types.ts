@@ -1,11 +1,13 @@
-export type UserRole = 'student' | 'coaching' | 'library' | 'pg' | 'tiffin';
+import { Database } from './types/supabase';
 
+export type UserRole = Database['public']['Enums']['user_role'];
+
+// This is now our primary User type, based on the 'profiles' table
 export interface User {
   id: string;
   email: string;
-  password: string;
+  full_name: string | null;
   role: UserRole;
-  name: string;
 }
 
 export interface Review {

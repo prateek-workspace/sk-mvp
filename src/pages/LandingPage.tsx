@@ -48,16 +48,20 @@ const LandingPage: React.FC = () => {
   };
 
   const handleBookNow = (listing: Listing) => {
-    if (!user || user.role !== 'student') {
+    if (!user) {
       navigate('/login');
       return;
+    }
+    if (user.role !== 'student') {
+        alert("Only students can make bookings.");
+        return;
     }
     
     const booking = {
       id: `BK${Date.now()}`,
       listingId: listing.id,
       userId: user.id,
-      userName: user.name,
+      userName: user.full_name || 'Student',
       userEmail: user.email,
       status: 'pending' as const,
       createdAt: new Date().toISOString(),

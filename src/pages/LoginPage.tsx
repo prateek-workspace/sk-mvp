@@ -1,37 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
-import { mockUsers } from '../data/mockData';
+import { supabase } from '../utils/supabase';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Redirect if user is logged in and auth is no longer loading
+    if (user && !authLoading) {
+      navigate(`/dashboard/${user.role}`, { replace: true });
+    }
+  }, [user, authLoading, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = mockUsers.find(
-      (u) => u.email === email && u.password === password
-    );
 
-    if (user) {
-      login(user);
-      navigate(`/dashboard/${user.role}`);
-    } else {
-      setError('Invalid credentials. Please try again.');
-    }
-  };
+    const promise = supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  const quickLogin = (userEmail: string) => {
-    const user = mockUsers.find((u) => u.email === userEmail);
-    if (user) {
-      login(user);
-      navigate(`/dashboard/${user.role}`);
-    }
+    toast.promise(promise, {
+      loading: 'Signing in...',
+      success: (data) => {
+        if (data.error) throw data.error;
+        return 'Login successful! Welcome back.';
+        // Redirect is handled by AuthContext
+      },
+      error: (err) => {
+        if (err.message === 'Email not confirmed') {
+          return 'Email not verified. Please check your inbox.';
+        }
+        return 'Invalid email or password.';
+      },
+    });
   };
 
   return (
@@ -82,36 +91,20 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            {error && (
-              <p className="text-red-500 text-sm bg-red-100 dark:bg-red-900/40 dark:text-red-400 px-4 py-2 rounded-lg text-center">
-                {error}
-              </p>
-            )}
-
             <button
               type="submit"
-              className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center disabled:bg-blue-400"
             >
               Sign In
             </button>
           </form>
 
-          <div className="mt-8 border-t border-border pt-6">
-            <h3 className="text-sm font-medium mb-4 text-center text-foreground-muted">
-              Or use a demo account
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {mockUsers.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => quickLogin(user.email)}
-                  className="px-3 py-2 bg-surface border border-border rounded-lg text-center hover:border-primary transition-colors"
-                >
-                  <p className="font-semibold capitalize text-sm">{user.role}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+          <p className="text-center text-sm text-foreground-muted mt-8">
+            Don't have an account?{' '}
+            <Link to="/signup" className="font-semibold text-primary hover:underline">
+              Sign Up
+            </Link>
+          </p>
         </motion.div>
       </div>
     </div>

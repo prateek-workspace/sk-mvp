@@ -5,11 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    signOut();
     navigate('/');
   };
 
@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
                <div className="flex items-center gap-2">
                 <Link to={getDashboardLink()} className="flex items-center gap-2 p-2 rounded-full border border-border hover:shadow-md transition-shadow">
                     <Menu className="w-5 h-5 text-foreground-muted" />
-                    <img src={`https://i.pravatar.cc/150?u=${user.id}`} alt={user.name} className="w-8 h-8 rounded-full" />
+                    <img src={`https://i.pravatar.cc/150?u=${user.id}`} alt={user.full_name || 'User'} className="w-8 h-8 rounded-full" />
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -65,12 +65,20 @@ const Navbar: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
-              >
-                Login
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="px-4 py-2 text-primary rounded-lg text-sm font-semibold hover:bg-primary/10 transition-colors hidden sm:block"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
         </div>

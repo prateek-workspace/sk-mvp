@@ -36,7 +36,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, bookings }) =
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h2 className="text-xl sm:text-2xl text-foreground-default font-semibold">Welcome back, {user.name} 👋</h2>
+        <h2 className="text-xl sm:text-2xl text-foreground-default font-semibold">Welcome back, {user.full_name} 👋</h2>
         <p className="text-foreground-muted">Here's an overview of your bookings and activity.</p>
       </motion.div>
 
