@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
-import { supabase } from '../utils/supabase';
+import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
@@ -21,25 +21,25 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const promise = supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const promise = api.post('/auth/login', { email, password });
 
     toast.promise(promise, {
       loading: 'Signing in...',
       success: (data) => {
-        if (data.error) throw data.error;
+        // data should contain access_token and user
+        if (!data?.access_token) throw new Error('Invalid response from server');
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        api.setToken(data.access_token);
         return 'Login successful! Welcome back.';
-        // Redirect is handled by AuthContext
       },
-      error: (err) => {
-        if (err.message === 'Email not confirmed') {
-          return 'Email not verified. Please check your inbox.';
-        }
-        return 'Invalid email or password.';
+      error: (err: any) => {
+        const msg = err?.message || 'Invalid email or password.';
+        return msg;
       },
+    }).then(() => {
+      // Reload so AuthProvider picks up new token immediately
+      window.location.reload();
     });
   };
 

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Mail, Lock, User as UserIcon, Briefcase, ArrowLeft } from 'lucide-react';
-import { supabase } from '../utils/supabase';
+import api from '../utils/api';
 import { UserRole } from '../types';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,30 +23,26 @@ const SignupPage: React.FC = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const promise = supabase.auth.signUp({
+    // Call backend register endpoint
+    const promise = api.post('/auth/register', {
+      name: fullName,
       email,
       password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: role,
-        },
-        emailRedirectTo: `${window.location.origin}/login`,
-      },
+      role,
     });
 
     toast.promise(promise, {
       loading: 'Creating your account...',
       success: (data) => {
-        if (data.error) throw data.error;
-        if (data.data.user?.identities?.length === 0) {
-          throw new Error('A user with this email already exists.');
-        }
-        setTimeout(() => navigate('/login'), 1000);
-        return 'Verification email sent! Please check your inbox.';
+        if (!data?.access_token) throw new Error('Invalid response from server');
+        // Store token and user, then redirect to dashboard
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        api.setToken(data.access_token);
+        setTimeout(() => navigate(`/dashboard/${data.user.role}`), 500);
+        return 'Account created! Redirecting...';
       },
-      error: (err) => err.message || 'An unexpected error occurred.',
+      error: (err: any) => err.message || 'An unexpected error occurred.',
     });
   };
 
