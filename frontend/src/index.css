@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background: #FFFFFF;
+    --color-surface: #F9FAFB;
+    --color-primary: #F43F5E; /* Rose 500 */
+    --color-accent: #3B82F6; /* Blue 500 */
+    --color-border: #E5E7EB;
+    --color-foreground-default: #111827;
+    --color-foreground-muted: #6B7280;
+  }
+
+  .dark {
+    --color-background: #030712; /* Gray 950 */
+    --color-surface: #111827; /* Gray 900 */
+    --color-primary: #F43F5E; /* Rose 500 */
+    --color-accent: #3B82F6; /* Blue 500 */
+    --color-border: #1F2937; /* Gray 800 */
+    --color-foreground-default: #F9FAFB;
+    --color-foreground-muted: #9CA3AF;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground-default font-sans antialiased;
+  }
+
+  /* For Hero Background */
+  .hero-bg-light {
+    background-image: linear-gradient(to top, var(--color-background) 20%, rgba(255,255,255,0) 80%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop');
+  }
+  .dark .hero-bg-dark {
+    background-image: linear-gradient(to top, var(--color-background) 20%, rgba(3,7,18,0) 80%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop');
+  }
+}
