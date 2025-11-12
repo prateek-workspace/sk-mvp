@@ -14,7 +14,7 @@ def register_user_via_supabase(name: str, email: str, password: str, role: str):
             "password": password,
             "options": {"data": {"name": str(name), "role": str(role)}}
         })
-        print("✅ Supabase signup response:", res)
+        # print("✅ Supabase signup response:", res)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Supabase signup failed: {str(e)}")
 
@@ -37,7 +37,7 @@ def login_user_via_supabase(email: str, password: str):
     """
     try:
         res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-        print("✅ Supabase login response:", res)
+        # print("✅ Supabase login response:", res)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Login failed: {str(e)}")
 
