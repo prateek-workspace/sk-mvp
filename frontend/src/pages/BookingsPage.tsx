@@ -1,43 +1,86 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getBookings, updateBookingStatus } from '../utils/storage';
-import { mockListings } from '../data/mockData';
-import { Booking } from '../types';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
+import { BookingsService } from '../services/bookings.service';
+import toast from 'react-hot-toast';
+
+type Booking = {
+  id: number;
+  listing_id: number;
+  user_id: number;
+  status: string;
+  amount: number;
+  quantity: number;
+  payment_verified: boolean;
+  created_at: string;
+  listing?: { name: string; location: string };
+  user?: { name: string; email: string };
+};
+
+const ITEMS_PER_PAGE = 5;
 
 const BookingsPage: React.FC = () => {
   const { role } = useParams<{ role: string }>();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
+    if (authLoading) return;
+    
     if (!user || user.role !== role) {
       navigate('/login');
       return;
     }
     loadBookings();
-  }, [user, role, navigate]);
+  }, [user, role, navigate, authLoading]);
 
-  const loadBookings = () => {
-    const allBookings = getBookings();
-    if (user?.role === 'student') {
-      setBookings(allBookings.filter((b) => b.userId === user.id).sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
-    } else {
-      const myListings = mockListings
-        .filter((l) => l.ownerId === user?.id)
-        .map((l) => l.id);
-      setBookings(allBookings.filter((b) => myListings.includes(b.listingId)).sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+  const loadBookings = async () => {
+    try {
+      setLoading(true);
+      const data = await BookingsService.getBookings();
+      setBookings(data.bookings || []);
+    } catch (error: any) {
+      console.error('Failed to load bookings:', error);
+      toast.error('Failed to load bookings');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleStatusUpdate = (bookingId: string, status: 'accepted' | 'rejected') => {
-    updateBookingStatus(bookingId, status);
-    loadBookings();
+  const handleStatusUpdate = async (bookingId: number, status: 'accepted' | 'rejected') => {
+    try {
+      await BookingsService.updateBookingStatus(bookingId, { status });
+      toast.success(`Booking ${status} successfully`);
+      loadBookings();
+    } catch (error: any) {
+      console.error('Failed to update booking:', error);
+      toast.error('Failed to update booking status');
+    }
   };
+
+  const filteredBookings = useMemo(() => {
+    if (statusFilter === 'all') return bookings;
+    return bookings.filter(b => b.status === statusFilter);
+  }, [bookings, statusFilter]);
+
+  const totalPages = Math.ceil(filteredBookings.length / ITEMS_PER_PAGE);
+  const paginatedBookings = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredBookings.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredBookings, currentPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
 
   const getStatusPill = (status: string) => {
     switch (status) {
@@ -50,30 +93,89 @@ const BookingsPage: React.FC = () => {
     }
   };
 
-  if (!user || !role) return null;
+  if (authLoading) {
+    return (
+      <DashboardLayout role={role || 'user'} pageTitle="Bookings">
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!user || user.role !== role) return null;
 
   return (
     <DashboardLayout role={role} pageTitle="Bookings Management">
+      {/* Status Filter - Only for listers/admin */}
+      {user?.role !== 'user' && (
+        <div className="mb-4 flex gap-2">
+          <button
+            onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              statusFilter === 'all'
+                ? 'bg-primary text-white'
+                : 'bg-surface text-foreground-muted hover:bg-primary/10'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => { setStatusFilter('pending'); setCurrentPage(1); }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              statusFilter === 'pending'
+                ? 'bg-yellow-500 text-white'
+                : 'bg-surface text-foreground-muted hover:bg-yellow-500/10'
+            }`}
+          >
+            Pending
+          </button>
+          <button
+            onClick={() => { setStatusFilter('accepted'); setCurrentPage(1); }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              statusFilter === 'accepted'
+                ? 'bg-green-500 text-white'
+                : 'bg-surface text-foreground-muted hover:bg-green-500/10'
+            }`}
+          >
+            Accepted
+          </button>
+          <button
+            onClick={() => { setStatusFilter('rejected'); setCurrentPage(1); }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              statusFilter === 'rejected'
+                ? 'bg-red-500 text-white'
+                : 'bg-surface text-foreground-muted hover:bg-red-500/10'
+            }`}
+          >
+            Rejected
+          </button>
+        </div>
+      )}
+
       <div className="bg-background rounded-xl border border-border overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-surface">
               <tr>
                 <th className="px-6 py-4 text-left font-semibold text-foreground-muted hidden md:table-cell">Booking ID</th>
-                <th className="px-6 py-4 text-left font-semibold text-foreground-muted">{user.role === 'student' ? 'Service' : 'Customer'}</th>
+                <th className="px-6 py-4 text-left font-semibold text-foreground-muted">{user.role === 'user' ? 'Service' : 'Customer'}</th>
                 <th className="px-6 py-4 text-left font-semibold text-foreground-muted hidden sm:table-cell">Amount</th>
                 <th className="px-6 py-4 text-left font-semibold text-foreground-muted">Status</th>
-                {user.role !== 'student' && <th className="px-6 py-4 text-left font-semibold text-foreground-muted">Actions</th>}
+                {user.role !== 'user' && <th className="px-6 py-4 text-left font-semibold text-foreground-muted">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {bookings.length === 0 ? (
+              {paginatedBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={user.role === 'student' ? 4 : 5} className="px-6 py-16 text-center text-foreground-muted">No bookings found</td>
+                  <td colSpan={user.role === 'user' ? 4 : 5} className="px-6 py-16 text-center text-foreground-muted">
+                    {filteredBookings.length === 0 && statusFilter !== 'all' 
+                      ? `No ${statusFilter} bookings found`
+                      : 'No bookings found'}
+                  </td>
                 </tr>
               ) : (
-                bookings.map((booking, idx) => {
-                  const listing = mockListings.find((l) => l.id === booking.listingId);
+                paginatedBookings.map((booking, idx) => {
                   return (
                     <motion.tr
                       key={booking.id}
@@ -84,12 +186,16 @@ const BookingsPage: React.FC = () => {
                     >
                       <td className="px-6 py-4 font-mono text-xs text-foreground-muted hidden md:table-cell">{booking.id}</td>
                       <td className="px-6 py-4">
-                        <p className="font-semibold text-foreground-default">{user.role === 'student' ? listing?.name : booking.userName}</p>
-                        <p className="text-foreground-muted text-xs sm:text-sm">{user.role === 'student' ? listing?.location : booking.userEmail}</p>
+                        <p className="font-semibold text-foreground-default">
+                          {user?.role === 'student' ? booking.listing?.name || 'Unknown Listing' : booking.user?.name || 'Unknown User'}
+                        </p>
+                        <p className="text-foreground-muted text-xs sm:text-sm">
+                          {user?.role === 'student' ? booking.listing?.location || 'Unknown Location' : booking.user?.email || 'Unknown Email'}
+                        </p>
                       </td>
-                      <td className="px-6 py-4 font-semibold text-foreground-default hidden sm:table-cell">₹{booking.amount.toLocaleString('en-IN')}</td>
+                      <td className="px-6 py-4 font-semibold text-foreground-default hidden sm:table-cell">₹{(booking.total_amount || 0).toLocaleString('en-IN')}</td>
                       <td className="px-6 py-4">{getStatusPill(booking.status)}</td>
-                      {user.role !== 'student' && (
+                      {user?.role !== 'user' && (
                         <td className="px-6 py-4">
                           {booking.status === 'pending' ? (
                             <div className="flex space-x-2">
@@ -106,6 +212,46 @@ const BookingsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+            <div className="text-sm text-foreground-muted">
+              Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredBookings.length)} of {filteredBookings.length} bookings
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
+                      currentPage === page
+                        ? 'bg-primary text-white'
+                        : 'hover:bg-surface text-foreground-muted'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

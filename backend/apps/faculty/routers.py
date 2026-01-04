@@ -96,8 +96,8 @@ async def upload_faculty_image(
     if not faculty:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Faculty not found")
     
-    # Upload to Cloudinary (async call)
-    result = await CloudinaryService.upload_image(
+    # Upload to Cloudinary (synchronous call)
+    result = CloudinaryService.upload_image(
         file=file, 
         folder=f"prephub/faculty/{faculty.listing_id}/{faculty_id}"
     )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -17,46 +17,65 @@ import Navbar from '../components/Navbar';
 import ListingCard from '../components/ListingCard';
 import ListingDetailsModal from '../components/ListingDetailsModal';
 import FloatingElements from '../components/FloatingElements';
-import { mockListings, mockReviews } from '../data/mockData';
 import { Listing } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { saveBooking } from '../utils/storage';
 import toast from 'react-hot-toast';
+import { ListingsService } from '../services/listings.service';
+import { BookingsService } from '../services/bookings.service';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
+  const fetchListings = async () => {
+    try {
+      setLoading(true);
+      const data = await ListingsService.getListings();
+      setListings(data || []);
+    } catch (error: any) {
+      console.error('Failed to fetch listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleViewDetails = (listing: Listing) => {
     setSelectedListing(listing);
   };
 
-  const handleBookNow = (listing: Listing) => {
+  const handleBookNow = async (listing: Listing) => {
     if (!user) {
       toast.error('Please log in to make a booking.');
       navigate('/login');
       return;
     }
-    if (user.role !== 'student') {
-        toast.error('Only students can make bookings.');
-        return;
+    if (user.role !== 'student' && user.role !== 'user') {
+      toast.error('Only students can make bookings.');
+      return;
     }
     
-    const booking = {
-      id: `BK${Date.now()}`,
-      listingId: listing.id,
-      userId: user.id,
-      userName: user.full_name || 'Student',
-      userEmail: user.email,
-      status: 'pending' as const,
-      createdAt: new Date().toISOString(),
-      amount: listing.price,
-    };
+    try {
+      const response = await BookingsService.createBooking({
+        listing_id: listing.id,
+        quantity: 1,
+      });
 
-    saveBooking(booking);
-    setSelectedListing(null);
-    toast.success('Booking request sent successfully!');
+      if (response?.booking) {
+        setSelectedListing(null);
+        toast.success('Booking request sent successfully!');
+        navigate(`/dashboard/${user.role}/bookings`);
+      }
+    } catch (error: any) {
+      console.error('Booking error:', error);
+      toast.error(error.message || 'Failed to create booking');
+    }
   };
 
   const handleContactSubmit = (e: React.FormEvent) => {
@@ -73,12 +92,13 @@ const LandingPage: React.FC = () => {
   ];
 
   const metrics = [
-    { value: '500+', label: 'Total Services' },
+    { value: `${listings.length}+`, label: 'Total Services' },
     { value: '2000+', label: 'Active Students' },
     { value: '30+', label: 'Cities Covered' },
   ];
   
-  const testimonials = mockReviews.slice(0, 6);
+  // Get featured listings (limit to 6)
+  const featuredListings = listings.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -145,7 +165,7 @@ const LandingPage: React.FC = () => {
 
         {/* Dynamic Category Sections */}
         {categories.map((category, index) => {
-          const listingsForCategory = mockListings.filter(l => l.type === category.id).slice(0, 3);
+          const listingsForCategory = listings.filter(l => l.type === category.id).slice(0, 3);
           if (listingsForCategory.length === 0) return null;
 
           return (
@@ -210,39 +230,18 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Testimonials Section */}
+        {/* Testimonials Section - Hidden until we have real reviews */}
+        {/* 
         <section id="testimonials" className="py-24 bg-background">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-4 text-foreground-default">What Our Students Say</h2>
             <p className="text-center text-foreground-muted mb-12 max-w-2xl mx-auto">Real stories from students who found their perfect fit on PrepHub.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((review, idx) => (
-                <motion.div
-                  key={review.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.05, duration: 0.5 }}
-                  className="bg-surface border border-border rounded-xl p-6 flex flex-col shadow-subtle"
-                >
-                  <Quote className="w-8 h-8 text-primary/30 mb-4" />
-                  <p className="text-foreground-muted flex-grow mb-6">"{review.comment}"</p>
-                  <div className="flex items-center gap-4 mt-auto border-t border-border pt-4">
-                    <img src={review.avatar} alt={review.author} className="w-12 h-12 rounded-full object-cover" />
-                    <div>
-                      <p className="font-semibold text-foreground-default">{review.author}</p>
-                      <div className="flex items-center">
-                        {[...Array(review.rating)].map((_, i) => (
-                           <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="text-center py-12">
+              <p className="text-foreground-muted">Reviews coming soon...</p>
             </div>
           </div>
         </section>
+        */}
 
         {/* Contact Section */}
         <section id="contact" className="py-24 bg-surface">

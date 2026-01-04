@@ -11,6 +11,8 @@ import {
   Building2,
   UserCog,
   User as UserIcon,
+  Home,
+  Search,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSidebar } from '../context/SidebarContext';
@@ -94,6 +96,35 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
         </div>
 
         <nav className="flex-grow p-4 space-y-2 overflow-y-auto">
+          {/* Navigation Links */}
+          <div className="pb-2 mb-2 border-b border-border space-y-2">
+            <Link
+              to="/"
+              title={isCollapsed ? 'Home' : ''}
+              className={`flex items-center space-x-3 rounded-lg text-sm font-semibold transition-all overflow-hidden ${isCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} ${
+                location.pathname === '/'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-foreground-muted hover:bg-surface hover:text-foreground-default'
+              }`}
+            >
+              <Home className="w-5 h-5 flex-shrink-0" />
+              <motion.span variants={textVariants} className="whitespace-nowrap">Home</motion.span>
+            </Link>
+            <Link
+              to="/listings"
+              title={isCollapsed ? 'Browse Listings' : ''}
+              className={`flex items-center space-x-3 rounded-lg text-sm font-semibold transition-all overflow-hidden ${isCollapsed ? 'justify-center p-3' : 'px-4 py-2.5'} ${
+                location.pathname === '/listings'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-foreground-muted hover:bg-surface hover:text-foreground-default'
+              }`}
+            >
+              <Search className="w-5 h-5 flex-shrink-0" />
+              <motion.span variants={textVariants} className="whitespace-nowrap">Browse Listings</motion.span>
+            </Link>
+          </div>
+
+          {/* Dashboard Menu Items */}
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;

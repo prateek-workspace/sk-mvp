@@ -28,13 +28,22 @@ type ListingWithFaculty = {
 const ListingFormPage: React.FC = () => {
   const { role, listingId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [listing, setListing] = useState<ListingWithFaculty | null>(null);
   const [loading, setLoading] = useState(false);
 
   const isEditMode = !!listingId;
 
   useEffect(() => {
+    // Wait for auth to finish loading
+    if (authLoading) return;
+
+    // If not authenticated after loading, redirect to login
+    if (!user || !role) {
+      navigate('/login');
+      return;
+    }
+
     if (isEditMode) {
       setLoading(true);
       const fetchListing = async () => {
@@ -50,10 +59,18 @@ const ListingFormPage: React.FC = () => {
       };
       fetchListing();
     }
-  }, [listingId, isEditMode, navigate, role]);
+  }, [listingId, isEditMode, navigate, role, user, authLoading]);
+
+  // Show loading while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!user || !role) {
-    navigate('/login');
     return null;
   }
   

@@ -125,8 +125,9 @@ const ListingForm: React.FC<ListingFormProps> = ({ user, existingListing, isEdit
       if (user.role === 'coaching') {
         // Delete old faculty if updating
         if (isEditMode && existingListing) {
-          const oldFaculty = await api.get(`/faculty/?listing_id=${listingId}`);
-          for (const faculty of oldFaculty.faculty || []) {
+          const response = await api.get(`/faculty/?listing_id=${listingId}`);
+          const oldFaculty = response.faculty || [];
+          for (const faculty of oldFaculty) {
             await api.delete(`/faculty/${faculty.id}`);
           }
         }

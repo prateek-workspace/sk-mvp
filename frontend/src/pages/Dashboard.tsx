@@ -10,12 +10,14 @@ import { BookingsService } from '../services/bookings.service';
 
 const Dashboard: React.FC = () => {
   const { role } = useParams<{ role: string }>();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+    
     if (!user) {
       navigate('/login', { replace: true });
       return;
@@ -28,14 +30,7 @@ const Dashboard: React.FC = () => {
     }
 
     fetchBookings();
-  }, []);  // Run only once on mount
-
-  // Separate effect to handle user/role changes
-  useEffect(() => {
-    if (user && user.role === role) {
-      fetchBookings();
-    }
-  }, [user?.id, role]);
+  }, [authLoading, user, role, navigate]);
 
   const fetchBookings = async () => {
     try {
@@ -50,6 +45,16 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <DashboardLayout role={role || 'user'} pageTitle="Dashboard">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   if (!user || !role) return null;
 

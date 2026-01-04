@@ -122,8 +122,8 @@ async def upload_listing_image(
     if listing.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to upload media for this listing")
     
-    # Upload to Cloudinary (async call)
-    result = await CloudinaryService.upload_image(
+    # Upload to Cloudinary (synchronous call)
+    result = CloudinaryService.upload_image(
         file=file, 
         folder=f"prephub/listings/{listing_id}"
     )

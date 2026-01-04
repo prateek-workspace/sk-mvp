@@ -81,10 +81,14 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                       <h4 className="font-semibold text-lg text-foreground-default mb-6 pb-2 border-b border-border">Meet The Faculty</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {listing.faculty.map((teacher, i) => (
-                          <div key={i} className="text-center flex flex-col items-center">
-                            <img src={teacher.image} alt={teacher.name} className="w-24 h-24 rounded-full mx-auto mb-3 object-cover shadow-md border-2 border-surface" />
+                          <div key={teacher.id || i} className="text-center flex flex-col items-center">
+                            <img 
+                              src={teacher.image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(teacher.name) + '&background=random'} 
+                              alt={teacher.name} 
+                              className="w-24 h-24 rounded-full mx-auto mb-3 object-cover shadow-md border-2 border-surface" 
+                            />
                             <p className="font-semibold text-foreground-default">{teacher.name}</p>
-                            <p className="text-sm text-primary font-medium">{teacher.subject}</p>
+                            <p className="text-sm text-primary font-medium">{teacher.subject || 'Instructor'}</p>
                           </div>
                         ))}
                       </div>

@@ -46,6 +46,9 @@ const Navbar: React.FC = () => {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/listings" className="text-sm font-medium text-foreground-muted hover:text-primary transition-colors">
+              Browse Listings
+            </Link>
             <NavLink href="/#categories">Categories</NavLink>
             <NavLink href="/#about">About Us</NavLink>
             <NavLink href="/#testimonials">Testimonials</NavLink>

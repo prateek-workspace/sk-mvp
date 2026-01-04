@@ -38,7 +38,7 @@ class CloudinaryService:
         )
 
         return {
-            "url": result["url"],
+            "url": result["secure_url"],  # Use secure_url for HTTPS
             "secure_url": result["secure_url"],
             "public_id": result["public_id"],
             "format": result["format"],

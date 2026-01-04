@@ -170,8 +170,8 @@ async def upload_profile_image(
     current_user: User = Depends(AccountService.current_user)
 ):
     """Upload profile image to Cloudinary and update user profile"""
-    # Upload to Cloudinary (async call)
-    result = await CloudinaryService.upload_image(file, folder="prephub/profiles")
+    # Upload to Cloudinary (synchronous call)
+    result = CloudinaryService.upload_image(file, folder="prephub/profiles")
     
     # Get user ID (handle both User object and dict)
     user_id = current_user.id if isinstance(current_user, User) else current_user['id']

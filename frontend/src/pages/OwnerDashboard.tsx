@@ -129,11 +129,11 @@ const OwnerDashboard: React.FC = () => {
         {/* Actions */}
         <div className="flex gap-3">
           <Link
-            to="/listings/new"
+            to={`/dashboard/${user?.role}/listings`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            Add New Listing
+            Manage Listings
           </Link>
         </div>
 
@@ -151,11 +151,11 @@ const OwnerDashboard: React.FC = () => {
             <div className="p-8 text-center">
               <p className="text-foreground-muted mb-4">You haven't created any listings yet</p>
               <Link
-                to="/listings/new"
+                to={`/dashboard/${user?.role}/listings`}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5" />
-                Create Your First Listing
+                Go to My Listings
               </Link>
             </div>
           ) : (

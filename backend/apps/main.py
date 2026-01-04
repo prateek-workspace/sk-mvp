@@ -34,6 +34,9 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_event():
     RouterManager(app).import_routers()
+    # Also include analytics router
+    from apps.core.analytics import router as analytics_router
+    app.include_router(analytics_router)
     logger.info("Routers loaded successfully.")
 
 @app.get("/")

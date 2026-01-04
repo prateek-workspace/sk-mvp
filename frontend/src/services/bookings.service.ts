@@ -40,8 +40,8 @@ export class BookingsService {
     return api.post(`/bookings/${bookingId}/payment`, data);
   }
 
-  static async updateBookingStatus(bookingId: number, status: 'accepted' | 'rejected'): Promise<Booking> {
-    return api.patch(`/bookings/${bookingId}/status`, { status });
+  static async updateBookingStatus(bookingId: number, data: BookingStatusRequest): Promise<Booking> {
+    return api.patch(`/bookings/${bookingId}/status`, data);
   }
 
   static async getAllBookingsAdmin(): Promise<Booking[]> {

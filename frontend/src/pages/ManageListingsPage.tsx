@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Loader2, AlertTriangle, Eye, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, AlertTriangle, Eye, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
@@ -51,9 +51,11 @@ type Booking = {
   user?: BookingUser;
 };
 
+const ITEMS_PER_PAGE = 5;
+
 const ManageListingsPage: React.FC = () => {
   const { role } = useParams<{ role: string }>();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,14 +65,29 @@ const ManageListingsPage: React.FC = () => {
   const [showBookings, setShowBookings] = useState<number | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const totalPages = Math.ceil(listings.length / ITEMS_PER_PAGE);
+  const paginatedListings = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return listings.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [listings, currentPage]);
 
   useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    
     if (!user || user.role !== role) {
       navigate('/login');
       return;
     }
     fetchListings();
-  }, [user, role, navigate]);
+  }, [user, role, navigate, authLoading]);
 
   const fetchListings = async () => {
     if (!user) return;
@@ -127,6 +144,18 @@ const ManageListingsPage: React.FC = () => {
     }
   };
 
+  if (authLoading) {
+    return (
+      <DashboardLayout role={role || 'user'} pageTitle="My Listings">
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!user || user.role !== role) return null;
+
   if (loading) {
     return (
       <DashboardLayout role={role!} pageTitle="My Listings">
@@ -157,7 +186,7 @@ const ManageListingsPage: React.FC = () => {
       <div className="flex justify-end mb-6">
         <Link
           to={`/dashboard/${role}/listings/new`}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
+            {paginatedListings.map((listing, idx) => (px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
         >
           <Plus className="w-5 h-5" />
           Create New Listing
@@ -226,6 +255,46 @@ const ManageListingsPage: React.FC = () => {
               </motion.li>
             ))}
           </ul>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className=\"flex items-center justify-between px-6 py-4 border-t border-border\">
+              <div className=\"text-sm text-foreground-muted\">
+                Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, listings.length)} of {listings.length} listings
+              </div>
+              <div className=\"flex items-center gap-2\">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className=\"p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors\"
+                >
+                  <ChevronLeft className=\"w-5 h-5\" />
+                </button>
+                <div className=\"flex items-center gap-1\">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
+                        currentPage === page
+                          ? 'bg-primary text-white'
+                          : 'hover:bg-surface text-foreground-muted'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className=\"p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors\"
+                >
+                  <ChevronRight className=\"w-5 h-5\" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
