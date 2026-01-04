@@ -2,14 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { supabase } from '../../utils/supabase';
 import { User } from '../../types';
-import { Database } from '../../types/supabase';
 import { PlusCircle, Trash2, UploadCloud, Loader2 } from 'lucide-react';
+import { ListingsService } from '../../services/listings.service';
+import api from '../../utils/api';
 
-type ListingRow = Database['public']['Tables']['listings']['Row'];
-type FacultyRow = Database['public']['Tables']['faculty']['Row'];
-type ListingWithFaculty = ListingRow & { faculty: FacultyRow[] };
+type Faculty = {
+  id?: number;
+  name: string;
+  subject: string;
+  image_url?: string;
+};
+
+type ListingWithFaculty = {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  location?: string;
+  features?: string[];
+  image_url?: string;
+  faculty: Faculty[];
+};
 
 interface ListingFormProps {
   user: User;
@@ -65,89 +79,79 @@ const ListingForm: React.FC<ListingFormProps> = ({ user, existingListing, isEdit
     }
   }, [watchImageFile]);
 
-  const uploadFile = async (file: File, path: string): Promise<string> => {
-    const { data, error } = await supabase.storage
-      .from('listing-images')
-      .upload(path, file, { upsert: true });
-
-    if (error) throw error;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('listing-images')
-      .getPublicUrl(data.path);
+  const uploadFile = async (file: File, listingId: number, facultyId?: number): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const endpoint = facultyId 
+      ? `/faculty/${facultyId}/media`
+      : `/listings/${listingId}/media`;
       
-    return publicUrl;
+    const response = await api.upload(endpoint, formData);
+    return response.image_url;
   };
 
   const onSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
     try {
-      let mainImageUrl = existingListing?.image_url || '';
-      if (formData.imageFile && formData.imageFile.length > 0) {
-        const file = formData.imageFile[0];
-        const filePath = `${user.id}/${Date.now()}_${file.name}`;
-        mainImageUrl = await uploadFile(file, filePath);
-      }
-
-      const facultyWithImageUrls = await Promise.all(
-        formData.faculty.map(async (facultyMember, index) => {
-          let facultyImageUrl = facultyMember.image_url || '';
-          if (facultyMember.imageFile && facultyMember.imageFile.length > 0) {
-            const file = facultyMember.imageFile[0];
-            const filePath = `${user.id}/faculty/${Date.now()}_${file.name}`;
-            facultyImageUrl = await uploadFile(file, filePath);
-          }
-          return { name: facultyMember.name, subject: facultyMember.subject, image_url: facultyImageUrl };
-        })
-      );
-
-      const listingData = {
-        owner_id: user.id,
+      // Prepare listing data
+      const listingData: any = {
         type: user.role,
         name: formData.name,
         description: formData.description,
         price: formData.price,
         location: formData.location,
         features: formData.features.map(f => f.value).filter(Boolean),
-        image_url: mainImageUrl,
       };
 
+      let listingId: number;
+
       if (isEditMode && existingListing) {
-        // Update
-        const { error: updateError } = await supabase
-          .from('listings')
-          .update(listingData)
-          .eq('id', existingListing.id);
-        if (updateError) throw updateError;
-
-        // Easiest way to handle faculty updates is to delete and re-insert
-        const { error: deleteFacultyError } = await supabase.from('faculty').delete().eq('listing_id', existingListing.id);
-        if (deleteFacultyError) throw deleteFacultyError;
-
-        if (facultyWithImageUrls.length > 0) {
-          const { error: insertFacultyError } = await supabase.from('faculty').insert(
-            facultyWithImageUrls.map(f => ({ ...f, listing_id: existingListing.id }))
-          );
-          if (insertFacultyError) throw insertFacultyError;
-        }
-        toast.success('Listing updated successfully!');
+        // Update listing
+        await api.put(`/listings/${existingListing.id}`, listingData);
+        listingId = existingListing.id;
       } else {
-        // Create
-        const { data: newListing, error: createError } = await supabase
-          .from('listings')
-          .insert(listingData)
-          .select()
-          .single();
-        if (createError) throw createError;
-
-        if (facultyWithImageUrls.length > 0) {
-          const { error: insertFacultyError } = await supabase.from('faculty').insert(
-            facultyWithImageUrls.map(f => ({ ...f, listing_id: newListing.id }))
-          );
-          if (insertFacultyError) throw insertFacultyError;
-        }
-        toast.success('Listing created successfully!');
+        // Create listing
+        const newListing = await api.post('/listings/', listingData);
+        listingId = newListing.id;
       }
+
+      // Upload main image if provided
+      if (formData.imageFile && formData.imageFile.length > 0) {
+        await uploadFile(formData.imageFile[0], listingId);
+      }
+
+      // Handle faculty for coaching centers
+      if (user.role === 'coaching') {
+        // Delete old faculty if updating
+        if (isEditMode && existingListing) {
+          const oldFaculty = await api.get(`/faculty/?listing_id=${listingId}`);
+          for (const faculty of oldFaculty.faculty || []) {
+            await api.delete(`/faculty/${faculty.id}`);
+          }
+        }
+
+        // Create new faculty members
+        if (formData.faculty.length > 0) {
+          const facultyData = formData.faculty.map(f => ({
+            listing_id: listingId,
+            name: f.name,
+            subject: f.subject,
+            image_url: f.image_url || '',
+          }));
+
+          const createdFaculty = await api.post('/faculty/bulk', facultyData);
+
+          // Upload faculty images
+          for (let i = 0; i < formData.faculty.length; i++) {
+            if (formData.faculty[i].imageFile && formData.faculty[i].imageFile!.length > 0) {
+              await uploadFile(formData.faculty[i].imageFile![0], listingId, createdFaculty[i].id);
+            }
+          }
+        }
+      }
+
+      toast.success(isEditMode ? 'Listing updated successfully!' : 'Listing created successfully!');
       navigate(`/dashboard/${user.role}/listings`);
     } catch (error: any) {
       console.error('Error saving listing:', error);

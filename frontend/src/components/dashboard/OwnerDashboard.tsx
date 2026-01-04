@@ -9,26 +9,31 @@ import {
 } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 import StatsCard from '../StatsCard';
+import BookingManagement from './BookingManagement';
 import { Booking, User } from '../../types';
-import { mockListings } from '../../data/mockData';
 import { useTheme } from '../../context/ThemeContext';
 
 interface OwnerDashboardProps {
   user: User;
   bookings: Booking[];
+  onBookingUpdate?: () => void;
 }
 
-const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, bookings }) => {
+const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, bookings, onBookingUpdate }) => {
   const { theme } = useTheme();
 
+  const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+  const acceptedBookings = bookings.filter(b => b.status === 'accepted').length;
+  const totalRevenue = bookings.filter(b => b.status === 'accepted').reduce((acc, b) => acc + b.amount, 0);
+
   const stats = {
-    todayRevenue: 53000,
-    revenueChange: -5,
-    totalUsers: 2300,
+    todayRevenue: totalRevenue,
+    revenueChange: 5,
+    totalUsers: bookings.length,
     usersChange: 4,
-    newClients: 3462,
-    clientsChange: -2,
-    totalSales: 103430,
+    newClients: acceptedBookings,
+    clientsChange: 2,
+    totalSales: totalRevenue,
     salesChange: 5,
   };
 
@@ -65,8 +70,6 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, bookings }) => {
       }],
     };
   }, [theme]);
-  
-  const recentBookings = bookings.slice(0, 5);
 
   return (
     <>
@@ -75,7 +78,7 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, bookings }) => {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h2 className="text-xl sm:text-2xl text-foreground-default font-semibold">Welcome back, {user.full_name} 👋</h2>
+        <h2 className="text-xl sm:text-2xl text-foreground-default font-semibold">Welcome back, {user.name} 👋</h2>
         <p className="text-foreground-muted">Here's a summary of your portal activity.</p>
       </motion.div>
 
@@ -92,37 +95,11 @@ const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, bookings }) => {
           <ReactECharts option={salesChartOption} style={{ height: '350px' }} notMerge={true} />
         </div>
 
-        <div className="xl:col-span-2 bg-background rounded-xl p-6 border border-border shadow-sm">
-          <h3 className="text-lg font-semibold mb-4 text-foreground-default">Recent Bookings</h3>
-          <div className="space-y-3">
-            {recentBookings.length === 0 ? (
-              <p className="text-foreground-muted text-center py-8">No recent bookings</p>
-            ) : (
-              recentBookings.map((booking) => {
-                const listing = mockListings.find((l) => l.id === booking.listingId);
-                return (
-                  <div key={booking.id} className="flex items-center justify-between p-3 bg-surface rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <img src={`https://i.pravatar.cc/150?u=${booking.userId}`} alt={booking.userName} className="w-10 h-10 rounded-full" />
-                      <div>
-                        <p className="font-semibold text-sm text-foreground-default">{booking.userName}</p>
-                        <p className="text-xs text-foreground-muted">{listing?.name}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-sm text-green-600">
-                        +₹{booking.amount.toLocaleString('en-IN')}
-                      </p>
-                      <div className="flex items-center space-x-1 text-xs text-foreground-muted">
-                        <Clock className="w-3 h-3" />
-                        <span>{new Date(booking.createdAt).toLocaleDateString('en-IN')}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+        <div className="xl:col-span-2">
+          <BookingManagement 
+            bookings={bookings} 
+            onUpdate={onBookingUpdate || (() => {})} 
+          />
         </div>
       </div>
     </>

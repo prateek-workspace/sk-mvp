@@ -2,14 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
-import { supabase } from '../utils/supabase';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import ListingForm from '../components/dashboard/ListingForm';
-import { Database } from '../types/supabase';
+import { ListingsService } from '../services/listings.service';
 
-type ListingWithFaculty = Database['public']['Tables']['listings']['Row'] & {
-  faculty: Database['public']['Tables']['faculty']['Row'][];
+type Faculty = {
+  id?: number;
+  name: string;
+  subject: string;
+  image_url?: string;
+};
+
+type ListingWithFaculty = {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  location?: string;
+  features?: string[];
+  image_url?: string;
+  faculty: Faculty[];
 };
 
 const ListingFormPage: React.FC = () => {
@@ -25,19 +38,15 @@ const ListingFormPage: React.FC = () => {
     if (isEditMode) {
       setLoading(true);
       const fetchListing = async () => {
-        const { data, error } = await supabase
-          .from('listings')
-          .select('*, faculty(*)')
-          .eq('id', listingId)
-          .single();
-        
-        if (error || !data) {
+        try {
+          const data = await ListingsService.getListing(Number(listingId));
+          setListing(data as any);
+        } catch (error) {
           toast.error('Failed to load listing data.');
           navigate(`/dashboard/${role}/listings`);
-        } else {
-          setListing(data as ListingWithFaculty);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       };
       fetchListing();
     }

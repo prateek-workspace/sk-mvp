@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import ListingCard from '../components/ListingCard';
 import ListingDetailsModal from '../components/ListingDetailsModal';
+import BookingQRModal from '../components/BookingQRModal';
 import Pagination from '../components/Pagination';
-import { mockListings } from '../data/mockData';
-import { Listing } from '../types';
+import { Listing, BookingWithQR } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { saveBooking } from '../utils/storage';
+import toast from 'react-hot-toast';
+import { ListingsService } from '../services/listings.service';
+import { BookingsService } from '../services/bookings.service';
 
 const LISTINGS_PER_PAGE = 8;
 
@@ -17,17 +19,37 @@ const ListingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
-  const [showBookingConfirm, setShowBookingConfirm] = useState(false);
+  const [bookingWithQR, setBookingWithQR] = useState<BookingWithQR | null>(null);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const category = searchParams.get('category');
 
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
+  const fetchListings = async () => {
+    try {
+      setLoading(true);
+      const data = await ListingsService.getListings();
+      setListings(data || []);
+    } catch (error: any) {
+      console.error('Failed to fetch listings:', error);
+      toast.error('Failed to load listings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredListings = useMemo(() => {
     if (!category) {
-      return mockListings;
+      return listings;
     }
-    return mockListings.filter(listing => listing.type === category);
-  }, [category]);
+    return listings.filter(listing => listing.type === category);
+  }, [category, listings]);
   
   useEffect(() => {
     setCurrentPage(1);
@@ -45,27 +67,33 @@ const ListingsPage: React.FC = () => {
     setSelectedListing(listing);
   };
 
-  const handleBookNow = (listing: Listing) => {
-    if (!user || user.role !== 'student') {
+  const handleBookNow = async (listing: Listing) => {
+    if (!user || user.role !== 'user') {
+      toast.error('Please login as a user to book services');
       navigate('/login');
       return;
     }
     
-    const booking = {
-      id: `BK${Date.now()}`,
-      listingId: listing.id,
-      userId: user.id,
-      userName: user.name,
-      userEmail: user.email,
-      status: 'pending' as const,
-      createdAt: new Date().toISOString(),
-      amount: listing.price,
-    };
+    try {
+      const response = await BookingsService.createBooking({
+        listing_id: listing.id,
+        amount: listing.price,
+        status: 'pending'
+      });
+      
+      setSelectedListing(null);
+      setBookingWithQR(response);
+      setShowQRModal(true);
+      toast.success('Booking created! Please complete payment');
+    } catch (error: any) {
+      console.error('Failed to create booking:', error);
+      toast.error(error.message || 'Failed to create booking');
+    }
+  };
 
-    saveBooking(booking);
-    setSelectedListing(null);
-    setShowBookingConfirm(true);
-    setTimeout(() => setShowBookingConfirm(false), 3000);
+  const handlePaymentSubmit = () => {
+    toast.success('Payment proof submitted! Awaiting approval');
+    fetchListings(); // Refresh listings
   };
 
   const handlePageChange = (page: number) => {
@@ -87,13 +115,6 @@ const ListingsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <ListingDetailsModal listing={selectedListing} onClose={() => setSelectedListing(null)} onBook={handleBookNow} />
-      
-      {showBookingConfirm && (
-        <div className="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-          Booking request sent successfully!
-        </div>
-      )}
 
       <main className="pt-28 pb-20">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,11 +126,15 @@ const ListingsPage: React.FC = () => {
           >
             <h1 className="text-4xl font-bold text-foreground-default">{getPageTitle()}</h1>
             <p className="text-lg text-foreground-muted mt-2">
-              Showing {filteredListings.length} results.
+              {loading ? 'Loading...' : `Showing ${filteredListings.length} results.`}
             </p>
           </motion.div>
 
-          {currentListings.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : currentListings.length > 0 ? (
             <>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
                 {currentListings.map((listing, idx) => (
@@ -141,6 +166,19 @@ const ListingsPage: React.FC = () => {
           </p>
         </div>
       </footer>
+
+      <ListingDetailsModal 
+        listing={selectedListing} 
+        onClose={() => setSelectedListing(null)} 
+        onBook={handleBookNow}
+      />
+
+      <BookingQRModal
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        bookingData={bookingWithQR}
+        onPaymentSubmit={handlePaymentSubmit}
+      />
     </div>
   );
 };

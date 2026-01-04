@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -8,6 +8,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Building2,
+  UserCog,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSidebar } from '../context/SidebarContext';
@@ -19,8 +21,14 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ role }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const { isCollapsed, toggleCollapse, isMobileOpen, setMobileOpen } = useSidebar();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login', { replace: true });
+  };
 
   const ownerMenuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: `/dashboard/${role}` },
@@ -29,13 +37,21 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     { icon: Settings, label: 'Settings', path: `/dashboard/${role}/settings` },
   ];
 
-  const studentMenuItems = [
+  const userMenuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: `/dashboard/${role}` },
     { icon: Users, label: 'My Bookings', path: `/dashboard/${role}/bookings` },
+    { icon: Settings, label: 'Profile', path: `/dashboard/${role}/settings` },
+  ];
+
+  const adminMenuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+    { icon: Building2, label: 'Manage Listings', path: '/admin/listings' },
+    { icon: UserCog, label: 'Manage Users', path: '/admin/users' },
     { icon: Settings, label: 'Settings', path: `/dashboard/${role}/settings` },
   ];
 
-  const menuItems = role === 'student' ? studentMenuItems : ownerMenuItems;
+  // Admin gets special menu, regular users don't have listings, service owners do
+  const menuItems = role === 'admin' ? adminMenuItems : (role === 'user' ? userMenuItems : ownerMenuItems);
   
   const sidebarVariants = {
     open: { width: '16rem' },
@@ -106,7 +122,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
               <p className="font-semibold text-sm text-foreground-default">{user?.full_name}</p>
               <p className="text-xs text-foreground-muted capitalize">{user?.role} Account</p>
             </motion.div>
-            <motion.button variants={textVariants} onClick={signOut} className="ml-auto text-foreground-muted hover:text-accent">
+            <motion.button 
+              variants={textVariants} 
+              onClick={handleSignOut} 
+              className="ml-auto text-foreground-muted hover:text-accent"
+              title="Logout"
+            >
               <LogOut className="w-5 h-5" />
             </motion.button>
           </div>

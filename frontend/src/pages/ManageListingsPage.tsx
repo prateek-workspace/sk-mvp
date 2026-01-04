@@ -1,25 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, MoreVertical, Edit, Trash2, Loader2, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../utils/supabase';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
-import { Database } from '../types/supabase';
+import { ListingsService } from '../services/listings.service';
 
-type ListingWithFaculty = Database['public']['Tables']['listings']['Row'] & {
-  faculty: Database['public']['Tables']['faculty']['Row'][];
+type Faculty = {
+  id: number;
+  name: string;
+  subject?: string;
+  image_url?: string;
+};
+
+type Listing = {
+  id: number;
+  owner_id: number;
+  type: string;
+  name: string;
+  description?: string;
+  price: number;
+  location?: string;
+  features?: string[];
+  image_url?: string;
+  created_at: string;
+  updated_at?: string;
+  faculty: Faculty[];
 };
 
 const ManageListingsPage: React.FC = () => {
   const { role } = useParams<{ role: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [listings, setListings] = useState<ListingWithFaculty[]>([]);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== role) {
@@ -34,43 +51,34 @@ const ManageListingsPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase
-      .from('listings')
-      .select('*, faculty(*)')
-      .eq('owner_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching listings:', error);
+    try {
+      const data = await ListingsService.getListings(undefined, user.id);
+      setListings(data || []);
+    } catch (err: any) {
+      console.error('Error fetching listings:', err);
       setError('Failed to fetch your listings. Please try again.');
       toast.error('Failed to fetch listings.');
-    } else {
-      setListings(data as ListingWithFaculty[]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleDelete = async (listingId: string) => {
+  const handleDelete = async (listingId: number) => {
     setShowDeleteConfirm(null);
-    const promise = new Promise(async (resolve, reject) => {
-      // Note: In a real app, you'd also delete associated images from storage.
-      const { error: facultyError } = await supabase.from('faculty').delete().eq('listing_id', listingId);
-      if (facultyError) return reject(facultyError);
-
-      const { error: listingError } = await supabase.from('listings').delete().eq('id', listingId);
-      if (listingError) return reject(listingError);
-      
-      resolve(true);
-    });
-
-    toast.promise(promise, {
-      loading: 'Deleting listing...',
-      success: () => {
-        fetchListings(); // Refresh list
-        return 'Listing deleted successfully.';
-      },
-      error: 'Failed to delete listing.',
-    });
+    
+    try {
+      await toast.promise(
+        ListingsService.deleteListing(listingId),
+        {
+          loading: 'Deleting listing...',
+          success: 'Listing deleted successfully.',
+          error: 'Failed to delete listing.',
+        }
+      );
+      fetchListings(); // Refresh list
+    } catch (error: any) {
+      console.error('Error deleting listing:', error);
+    }
   };
 
   if (loading) {

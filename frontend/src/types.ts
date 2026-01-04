@@ -1,13 +1,17 @@
-import { Database } from './types/supabase';
-
-export type UserRole = Database['public']['Enums']['user_role'];
-
-// This is now our primary User type, based on the 'profiles' table
+// This is now our primary User type
 export interface User {
-  id: string;
+  full_name: string;
+  id: number;
   email: string;
-  full_name: string | null;
-  role: UserRole;
+  name: string;
+  role: 'user' | 'admin' | 'hostel' | 'coaching' | 'library' | 'tiffin';
+  is_superuser?: boolean;
+  is_approved_lister?: boolean;
+  phone_number?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
 }
 
 export interface Review {
@@ -28,29 +32,40 @@ export interface Faculty {
 // This type is now mainly for the mock data on the landing page.
 // The new Supabase-driven parts will use types generated from the DB schema.
 export interface Listing {
-  id: string;
-  ownerId: string;
-  type: 'coaching' | 'library' | 'pg' | 'tiffin';
+  id: number;
+  owner_id: number;
+  type: 'coaching' | 'library' | 'pg' | 'tiffin' | 'hostel';
   name: string;
   description: string;
   price: number;
-  rating: number;
+  rating?: number;
   location: string;
-  image: string;
-  features: string[];
-  reviews: Review[];
+  image_url?: string;
+  features?: string[];
+  amenities?: string[];
+  reviews?: Review[];
   faculty?: Faculty[];
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Booking {
-  id: string;
-  listingId: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
+  id: number;
+  listing_id: number;
+  user_id: number;
   status: 'pending' | 'accepted' | 'rejected';
-  createdAt: string;
   amount: number;
+  payment_id?: string;
+  payment_screenshot?: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface BookingWithQR {
+  booking: Booking;
+  qr_code: string;
+  upi_id: string;
 }
 
 export interface DashboardStats {

@@ -12,7 +12,16 @@ import Dashboard from './pages/Dashboard';
 import BookingsPage from './pages/BookingsPage';
 import ListingsPage from './pages/ListingsPage';
 import ManageListingsPage from './pages/ManageListingsPage';
+import AdminDashboard from './pages/AdminDashboard';
+import OwnerDashboard from './pages/OwnerDashboard';
 import ListingFormPage from './pages/ListingFormPage';
+import SettingsPage from './pages/SettingsPage';
+
+// Admin pages
+import AdminListingsPage from './pages/admin/AdminListingsPage';
+import ListingDetailPage from './pages/admin/ListingDetailPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import UserDetailPage from './pages/admin/UserDetailPage';
 
 function App() {
   return (
@@ -52,15 +61,32 @@ function App() {
               <Route path="/listings" element={<ListingsPage />} />
 
               <Route element={<ProtectedRoute />}>
+                {/* Role-based Dashboards */}
+                <Route path="/dashboard/admin" element={<AdminDashboard />} />
+                <Route path="/dashboard/hostel" element={<OwnerDashboard />} />
+                <Route path="/dashboard/coaching" element={<OwnerDashboard />} />
+                <Route path="/dashboard/library" element={<OwnerDashboard />} />
+                <Route path="/dashboard/tiffin" element={<OwnerDashboard />} />
                 <Route path="/dashboard/:role" element={<Dashboard />} />
+                
+                {/* Admin routes */}
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/listings" element={<AdminListingsPage />} />
+                <Route path="/admin/listings/:id" element={<ListingDetailPage />} />
+                <Route path="/admin/users" element={<AdminUsersPage />} />
+                <Route path="/admin/users/:id" element={<UserDetailPage />} />
+                
+                {/* Common routes */}
                 <Route path="/dashboard/:role/bookings" element={<BookingsPage />} />
                 <Route path="/dashboard/:role/listings" element={<ManageListingsPage />} />
                 <Route path="/dashboard/:role/listings/new" element={<ListingFormPage />} />
                 <Route path="/dashboard/:role/listings/edit/:listingId" element={<ListingFormPage />} />
-                <Route
-                  path="/dashboard/:role/settings"
-                  element={<Dashboard />} // Placeholder
-                />
+                <Route path="/dashboard/:role/settings" element={<SettingsPage />} />
+                
+                <Route path="/listings/new" element={<ListingFormPage />} />
+                <Route path="/listings/:id/edit" element={<ListingFormPage />} />
+                <Route path="/bookings" element={<BookingsPage />} />
+                <Route path="/manage-listings" element={<ManageListingsPage />} />
               </Route>
               
               <Route path="*" element={<Navigate to="/" replace />} />

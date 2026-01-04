@@ -3,44 +3,57 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
-import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { AuthService } from '../services/auth.service';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, setAuth } = useAuth();
 
+  // Only redirect once on initial mount if already logged in
   useEffect(() => {
-    // Redirect if user is logged in and auth is no longer loading
-    if (user && !authLoading) {
+    if (!authLoading && user) {
       navigate(`/dashboard/${user.role}`, { replace: true });
     }
-  }, [user, authLoading, navigate]);
+  }, [authLoading]); // Only check when auth loading completes
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const promise = api.post('/auth/login', { email, password });
+    
+    if (isLoading) return;
+    
+    setIsLoading(true);
 
-    toast.promise(promise, {
-      loading: 'Signing in...',
-      success: (data) => {
-        // data should contain access_token and user
-        if (!data?.access_token) throw new Error('Invalid response from server');
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        api.setToken(data.access_token);
-        return 'Login successful! Welcome back.';
-      },
-      error: (err: any) => {
-        const msg = err?.message || 'Invalid email or password.';
-        return msg;
-      },
-    }).then(() => {
-      // Reload so AuthProvider picks up new token immediately
-      window.location.reload();
-    });
+    try {
+      const data = await AuthService.login(email, password);
+      
+      console.log('Login response:', data);
+
+      // Update auth context with token and user
+      setAuth(data.access_token, data.user);
+      
+      toast.success('Login successful! Redirecting...');
+      
+      // Wait a bit for the toast to show and auth to persist
+      setTimeout(() => {
+        // Redirect based on role
+        const role = data.user.role;
+        if (role === 'admin') {
+          navigate('/dashboard/admin', { replace: true });
+        } else if (['hostel', 'coaching', 'library', 'tiffin'].includes(role)) {
+          navigate(`/dashboard/${role}`, { replace: true });
+        } else {
+          navigate('/dashboard/user', { replace: true });
+        }
+      }, 500);
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast.error(error.message || 'Invalid email or password');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,9 +106,10 @@ const LoginPage: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center disabled:bg-blue-400"
+              disabled={isLoading}
+              className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              Sign In
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 

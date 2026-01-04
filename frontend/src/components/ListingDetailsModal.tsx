@@ -42,7 +42,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
 
             <div className="overflow-y-auto flex-grow">
               <div className="h-72 w-full">
-                <img src={listing.image} alt={listing.name} className="w-full h-full object-cover" />
+                <img src={listing.image_url || listing.image || 'https://via.placeholder.com/800x400'} alt={listing.name} className="w-full h-full object-cover" />
               </div>
               
               <div className="p-8 grid md:grid-cols-3 gap-8">
@@ -59,7 +59,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                   <div className="mb-8">
                     <h4 className="font-semibold text-lg text-foreground-default mb-4 pb-2 border-b border-border">Features</h4>
                     <ul className="grid grid-cols-2 gap-3">
-                      {listing.features.map((feature, i) => (
+                      {(listing.features || []).map((feature, i) => (
                         <li key={i} className="flex items-center text-sm text-foreground-default">
                           <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
                           {feature}
@@ -84,10 +84,10 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                   )}
 
                   <div>
-                    <h4 className="font-semibold text-lg text-foreground-default mb-4 pb-2 border-b border-border">Reviews ({listing.reviews.length})</h4>
-                    {listing.reviews.length > 0 ? (
+                    <h4 className="font-semibold text-lg text-foreground-default mb-4 pb-2 border-b border-border">Reviews ({(listing.reviews || []).length})</h4>
+                    {(listing.reviews || []).length > 0 ? (
                       <div className="space-y-6">
-                        {listing.reviews.map(review => (
+                        {(listing.reviews || []).map(review => (
                           <div key={review.id} className="flex items-start space-x-4">
                             <img src={review.avatar} alt={review.author} className="w-11 h-11 rounded-full" />
                             <div>
@@ -117,11 +117,11 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                     </div>
                     <button
                       onClick={() => onBook(listing)}
-                      className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
+                      className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30"
                     >
-                      Book Now
+                      Book Slot
                     </button>
-                    <p className="text-xs text-foreground-muted text-center mt-3">You won't be charged yet</p>
+                    <p className="text-xs text-foreground-muted text-center mt-3">Complete payment after booking</p>
                   </div>
                 </div>
               </div>

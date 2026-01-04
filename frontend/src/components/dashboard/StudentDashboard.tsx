@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Book, Clock, CheckCircle, Wallet } from 'lucide-react';
 import { Booking, User } from '../../types';
 import StudentStatCard from './StudentStatCard';
-import { mockListings } from '../../data/mockData';
 
 interface StudentDashboardProps {
   user: User;
@@ -18,12 +17,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, bookings }) =
 
   const recentBookings = bookings.slice(0, 5);
   
+  // Get display name - extract first part of email if name is just an email
+  const displayName = user.name?.includes('@') ? user.name.split('@')[0] : (user.name || 'User');
+  
   const getStatusPill = (status: string) => {
     switch (status) {
       case 'accepted':
         return <div className="flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/50"><CheckCircle className="w-3 h-3" /><span>Accepted</span></div>;
       case 'rejected':
         return <div className="flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/50"><Clock className="w-3 h-3" /><span>Rejected</span></div>;
+      case 'pending':
+        return <div className="flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/50"><Clock className="w-3 h-3" /><span>Pending</span></div>;
       default:
         return <div className="flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/50"><Clock className="w-3 h-3" /><span>Pending</span></div>;
     }
@@ -36,7 +40,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, bookings }) =
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h2 className="text-xl sm:text-2xl text-foreground-default font-semibold">Welcome back, {user.full_name} 👋</h2>
+        <h2 className="text-xl sm:text-2xl text-foreground-default font-semibold">Welcome back, {displayName} 👋</h2>
         <p className="text-foreground-muted">Here's an overview of your bookings and activity.</p>
       </motion.div>
 
@@ -53,29 +57,28 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, bookings }) =
           {recentBookings.length === 0 ? (
             <p className="text-foreground-muted text-center py-8">You haven't made any bookings yet.</p>
           ) : (
-            recentBookings.map((booking) => {
-              const listing = mockListings.find((l) => l.id === booking.listingId);
-              return (
-                <div key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-surface rounded-lg gap-4">
-                  <div className="flex items-center space-x-4">
-                    <img src={listing?.image} alt={listing?.name} className="w-16 h-10 rounded-md object-cover" />
-                    <div>
-                      <p className="font-semibold text-sm text-foreground-default">{listing?.name}</p>
-                      <p className="text-xs text-foreground-muted">{listing?.location}</p>
-                    </div>
+            recentBookings.map((booking) => (
+              <div key={booking.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-surface rounded-lg gap-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-10 rounded-md bg-surface-hover flex items-center justify-center">
+                    <Book className="w-6 h-6 text-foreground-muted" />
                   </div>
-                  <div className="flex items-center justify-between w-full sm:w-auto sm:space-x-8">
-                    <div className="text-left sm:text-right">
-                      <p className="font-semibold text-sm text-foreground-default">
-                        ₹{booking.amount.toLocaleString('en-IN')}
-                      </p>
-                      <p className="text-xs text-foreground-muted">{new Date(booking.createdAt).toLocaleDateString('en-IN')}</p>
-                    </div>
-                    {getStatusPill(booking.status)}
+                  <div>
+                    <p className="font-semibold text-sm text-foreground-default">Listing #{booking.listing_id}</p>
+                    <p className="text-xs text-foreground-muted">User ID: {booking.user_id}</p>
                   </div>
                 </div>
-              );
-            })
+                <div className="flex items-center justify-between w-full sm:w-auto sm:space-x-8">
+                  <div className="text-left sm:text-right">
+                    <p className="font-semibold text-sm text-foreground-default">
+                      ₹{booking.amount.toLocaleString('en-IN')}
+                    </p>
+                    <p className="text-xs text-foreground-muted">{new Date(booking.created_at).toLocaleDateString('en-IN')}</p>
+                  </div>
+                  {getStatusPill(booking.status)}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>

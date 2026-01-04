@@ -1,0 +1,96 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+from pydantic import BaseModel, EmailStr
+
+# Load .env from project root (if present)
+BASE_DIR = Path(__file__).resolve().parent.parent
+env_path = BASE_DIR / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
+
+project_name=os.getenv("PROJECT_NAME"),
+
+class AppConfig:
+    class _AppConfig(BaseModel):
+        app_name: str | None = None
+        secret_key: str | None = None
+        access_token_expire_minutes: int | None = None
+        otp_secret_key: str | None = None
+        otp_expire_seconds: int | None = None
+            # --- Resend Email API ---
+        resend_api_key: str | None = None
+        resend_from_email: str | None = None
+        project_name: str | None = None
+
+    config = _AppConfig(
+        app_name=os.getenv("APP_NAME"),
+        secret_key=os.getenv("SECRET_KEY"),
+        access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES") or 30),
+        otp_secret_key=os.getenv("OTP_SECRET_KEY"),
+        otp_expire_seconds=int(os.getenv("OTP_EXPIRE_SECONDS") or 360),
+
+        # --- Resend fields loaded from .env ---
+        resend_api_key=os.getenv("RESEND_API_KEY"),
+        resend_from_email=os.getenv("RESEND_FROM_EMAIL"),
+    )
+
+
+    @classmethod
+    def get_config(cls) -> _AppConfig:
+        return cls.config
+
+
+class EmailServiceConfig:
+    class _SMTPConfig(BaseModel):
+        smtp_server: str | None = None
+        smtp_port: int | None = None
+        smtp_username: EmailStr | None = None
+        smtp_password: str | None = None
+        use_local_fallback: bool = False
+
+    config = _SMTPConfig(
+        smtp_server=os.getenv("SMTP_SERVER"),
+        smtp_port=int(os.getenv("SMTP_PORT") or 587),
+        smtp_username=os.getenv("SMTP_USERNAME"),
+        smtp_password=os.getenv("SMTP_PASSWORD"),
+        use_local_fallback=os.getenv("USE_LOCAL_FALLBACK", "False").lower() == "true",
+    )
+
+    @classmethod
+    def get_config(cls) -> _SMTPConfig:
+        return cls.config
+
+
+# --- Database (only DATABASE_URL, NO SQLITE fallback) ---
+# Set DATABASE_URL in .env or environment. Example:
+# DATABASE_URL=postgresql://user:pass@host:5432/dbname?sslmode=require
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    # fail fast: require DATABASE_URL
+    raise RuntimeError("DATABASE_URL not set. Please set it in your .env or environment before starting the app.")
+
+# Neon PostgreSQL is configured via DATABASE_URL above
+# No Supabase SDK needed - using direct PostgreSQL connection
+
+
+# Media/settings
+# MEDIA_DIR = BASE_DIR / "media"
+# MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+
+
+MAX_FILE_SIZE = 5
+products_list_limit = 12
+
+
+PAYMENT_MODE: str = "mock"  
+# values: "mock" | "razorpay"
+
+RAZORPAY_KEY_ID: str | None = None
+RAZORPAY_KEY_SECRET: str | None = None
