@@ -75,14 +75,14 @@ const LoginPage: React.FC = () => {
           
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-foreground-muted">Email</label>
+              <label className="form-label">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-muted" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-input pl-10"
                   placeholder="you@example.com"
                   required
                 />
@@ -90,14 +90,14 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2 text-foreground-muted">Password</label>
+              <label className="form-label">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-muted" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="form-input pl-10"
                   placeholder="••••••••"
                   required
                 />

@@ -92,11 +92,7 @@ class UserOut(BaseModel):
     name: str
     is_superuser: bool
     is_approved_lister: bool = False
-    phone_number: str | None = None
-    address: str | None = None
-    city: str | None = None
-    state: str | None = None
-    pincode: str | None = None
+    profile_image: str | None = None
     phone_number: str | None = None
     address: str | None = None
     city: str | None = None
@@ -306,7 +302,16 @@ class UserSchema(BaseModel):
     email: EmailStr
     first_name: str | None
     last_name: str | None
+    profile_image: str | None = None
+    phone_number: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    pincode: str | None = None
     is_verified_email: bool
+    role: str
+    is_superuser: bool
+    is_approved_lister: bool
     date_joined: str
     updated_at: str
     last_login: str

@@ -98,7 +98,7 @@ def update_booking_status(
 
 
 @router.get("/", response_model=BookingListOut)
-def list_bookings(
+async def list_bookings(
     listing_id: int = Query(None),
     current_user: User = Depends(AccountService.current_user),
     service: BookingService = Depends(get_booking_service),

@@ -70,7 +70,30 @@ export class AuthService {
 
   static async getCurrentUser(): Promise<User> {
     const response: CurrentUserResponse = await api.get('/accounts/me');
-    return response.user;
+    const userData = response.user;
+    
+    // Map backend user_id to frontend id and extract name fields
+    const firstName = (userData as any).first_name || '';
+    const lastName = (userData as any).last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    
+    return {
+      id: (userData as any).user_id || (userData as any).id,
+      email: userData.email,
+      role: userData.role,
+      name: fullName || userData.email,
+      full_name: fullName,
+      first_name: firstName,
+      last_name: lastName,
+      is_superuser: userData.is_superuser,
+      is_approved_lister: userData.is_approved_lister,
+      profile_image: userData.profile_image,
+      phone_number: userData.phone_number,
+      address: userData.address,
+      city: userData.city,
+      state: userData.state,
+      pincode: userData.pincode,
+    };
   }
 
   static async logout(): Promise<void> {

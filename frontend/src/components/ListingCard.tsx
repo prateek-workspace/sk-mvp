@@ -23,7 +23,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, onViewDetails }) => 
     >
       <div className="relative w-full aspect-[4/3] overflow-hidden">
         <img
-          src={listing.image}
+          src={listing.image_url || 'https://via.placeholder.com/400x300?text=No+Image'}
           alt={listing.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />

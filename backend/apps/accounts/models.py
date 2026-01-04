@@ -33,6 +33,9 @@ class User(FastModel):
     first_name = Column(String(256), nullable=True)
     last_name = Column(String(256), nullable=True)
     
+    # Profile image
+    profile_image = Column(String(500), nullable=True)  # Cloudinary URL
+    
     # Contact and address information
     phone_number = Column(String(20), nullable=True)
     address = Column(String(500), nullable=True)

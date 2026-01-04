@@ -1,10 +1,11 @@
-from fastapi import APIRouter, status, Depends, Body, HTTPException
+from fastapi import APIRouter, status, Depends, Body, HTTPException, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 
 from apps.accounts import schemas
 from apps.accounts.services.authenticate import AccountService
 from apps.accounts.services.permissions import Permission
 from apps.accounts.services.user import User, UserManager
+from apps.core.cloudinary_service import CloudinaryService
 
 router = APIRouter(
     prefix='/accounts'
@@ -152,8 +153,31 @@ async def retrieve_me(current_user: User = Depends(AccountService.current_user))
     summary='Update current user',
     description='Update current user.',
     tags=['Users'])
-async def update_me(payload: schemas.UpdateUserSchema, current_user: User = Depends(AccountService.current_user)):
-    user = UserManager.update_user(current_user.id, **payload.model_dump())
+async def update_me(payload: schemas.UpdateUserIn, current_user: User = Depends(AccountService.current_user)):
+    user = UserManager.update_user(current_user.id, **payload.user.model_dump())
+    return {'user': UserManager.to_dict(user)}
+
+
+@router.post(
+    '/me/upload-image',
+    status_code=status.HTTP_200_OK,
+    response_model=schemas.CurrentUserOut,
+    summary='Upload profile image',
+    description='Upload a profile image for the current user.',
+    tags=['Users'])
+async def upload_profile_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(AccountService.current_user)
+):
+    """Upload profile image to Cloudinary and update user profile"""
+    # Upload to Cloudinary (async call)
+    result = await CloudinaryService.upload_image(file, folder="prephub/profiles")
+    
+    # Get user ID (handle both User object and dict)
+    user_id = current_user.id if isinstance(current_user, User) else current_user['id']
+    
+    # Update user with image URL
+    user = UserManager.update_user(user_id, profile_image=result['url'])
     return {'user': UserManager.to_dict(user)}
 
 

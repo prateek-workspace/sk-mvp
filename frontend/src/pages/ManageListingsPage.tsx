@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Loader2, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, AlertTriangle, Eye, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import { ListingsService } from '../services/listings.service';
+import ListingDetailsModal from '../components/ListingDetailsModal';
+import api from '../utils/api';
 
 type Faculty = {
   id: number;
@@ -27,6 +29,26 @@ type Listing = {
   created_at: string;
   updated_at?: string;
   faculty: Faculty[];
+  bookings_count?: number;
+};
+
+type BookingUser = {
+  id: number;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+};
+
+type Booking = {
+  id: number;
+  user_id: number;
+  listing_id: number;
+  status: string;
+  quantity: number;
+  payment_verified: boolean;
+  created_at: string;
+  user?: BookingUser;
 };
 
 const ManageListingsPage: React.FC = () => {
@@ -37,6 +59,10 @@ const ManageListingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [previewListing, setPreviewListing] = useState<Listing | null>(null);
+  const [showBookings, setShowBookings] = useState<number | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== role) {
@@ -78,6 +104,26 @@ const ManageListingsPage: React.FC = () => {
       fetchListings(); // Refresh list
     } catch (error: any) {
       console.error('Error deleting listing:', error);
+    }
+  };
+
+  const fetchBookingsForListing = async (listingId: number) => {
+    setLoadingBookings(true);
+    try {
+      // Set token for API
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        api.setToken(token);
+      }
+      
+      const data = await api.get(`/bookings/?listing_id=${listingId}`);
+      setBookings(data.bookings || []);
+      setShowBookings(listingId);
+    } catch (error: any) {
+      console.error('Error fetching bookings:', error);
+      toast.error('Failed to load booking details');
+    } finally {
+      setLoadingBookings(false);
     }
   };
 
@@ -132,18 +178,50 @@ const ManageListingsPage: React.FC = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="p-4 sm:p-6 flex items-center justify-between hover:bg-surface"
+                className="p-4 sm:p-6 hover:bg-surface"
               >
-                <div className="flex items-center gap-4">
-                  <img src={listing.image_url || 'https://img-wrapper.vercel.app/image?url=https://placehold.co/100x80/E2E8F0/4A5568?text=Image'} alt={listing.name} className="w-24 h-16 object-cover rounded-md hidden sm:block" />
-                  <div>
-                    <p className="font-semibold text-foreground-default">{listing.name}</p>
-                    <p className="text-sm text-foreground-muted">₹{listing.price.toLocaleString('en-IN')}/month</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    <img 
+                      src={listing.image_url || 'https://img-wrapper.vercel.app/image?url=https://placehold.co/100x80/E2E8F0/4A5568?text=Image'} 
+                      alt={listing.name} 
+                      className="w-24 h-16 object-cover rounded-md hidden sm:block" 
+                    />
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground-default">{listing.name}</p>
+                      <p className="text-sm text-foreground-muted">₹{listing.price.toLocaleString('en-IN')}/month</p>
+                      <button
+                        onClick={() => fetchBookingsForListing(listing.id)}
+                        className="mt-2 flex items-center gap-1 text-xs text-primary hover:underline"
+                      >
+                        <Users className="w-3 h-3" />
+                        View Bookings
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Link to={`/dashboard/${role}/listings/edit/${listing.id}`} className="p-2 text-foreground-muted hover:text-accent rounded-full hover:bg-surface"><Edit className="w-4 h-4" /></Link>
-                  <button onClick={() => setShowDeleteConfirm(listing.id)} className="p-2 text-foreground-muted hover:text-primary rounded-full hover:bg-surface"><Trash2 className="w-4 h-4" /></button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setPreviewListing(listing)}
+                      className="p-2 text-foreground-muted hover:text-accent rounded-full hover:bg-surface"
+                      title="Preview as user"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <Link 
+                      to={`/dashboard/${role}/listings/edit/${listing.id}`} 
+                      className="p-2 text-foreground-muted hover:text-accent rounded-full hover:bg-surface"
+                      title="Edit listing"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button 
+                      onClick={() => setShowDeleteConfirm(listing.id)} 
+                      className="p-2 text-foreground-muted hover:text-primary rounded-full hover:bg-surface"
+                      title="Delete listing"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </motion.li>
             ))}
@@ -165,6 +243,105 @@ const ManageListingsPage: React.FC = () => {
               <button onClick={() => handleDelete(showDeleteConfirm)} className="px-6 py-2 rounded-md bg-primary text-white">Delete</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewListing && (
+        <ListingDetailsModal
+          listing={previewListing}
+          onClose={() => setPreviewListing(null)}
+          onBook={() => {
+            toast('Booking disabled in preview mode', { icon: 'ℹ️' });
+          }}
+        />
+      )}
+
+      {/* Bookings Modal */}
+      {showBookings !== null && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-background rounded-lg p-6 max-w-3xl w-full max-h-[80vh] flex flex-col"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Booking Details</h3>
+              <button 
+                onClick={() => setShowBookings(null)}
+                className="p-2 hover:bg-surface rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {loadingBookings ? (
+              <div className="flex justify-center py-10">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : bookings.length === 0 ? (
+              <div className="text-center py-10 text-foreground-muted">
+                <Users className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                <p>No bookings yet for this listing</p>
+              </div>
+            ) : (
+              <div className="overflow-y-auto">
+                <div className="mb-4 p-3 bg-surface rounded-lg">
+                  <p className="text-sm text-foreground-muted">
+                    Total Bookings: <span className="font-semibold text-foreground-default">{bookings.length}</span>
+                  </p>
+                  <p className="text-sm text-foreground-muted">
+                    Accepted: <span className="font-semibold text-green-500">{bookings.filter(b => b.status === 'accepted').length}</span> | 
+                    Pending: <span className="font-semibold text-yellow-500"> {bookings.filter(b => b.status === 'pending').length}</span> | 
+                    Rejected: <span className="font-semibold text-red-500"> {bookings.filter(b => b.status === 'rejected').length}</span>
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {bookings.map((booking) => (
+                    <div key={booking.id} className="border border-border rounded-lg p-4 hover:bg-surface">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="font-medium text-foreground-default">
+                            {booking.user?.first_name || booking.user?.last_name 
+                              ? `${booking.user.first_name || ''} ${booking.user.last_name || ''}`.trim()
+                              : 'User'}
+                          </p>
+                          <p className="text-sm text-foreground-muted">{booking.user?.email || 'N/A'}</p>
+                          {booking.user?.phone_number && (
+                            <p className="text-sm text-foreground-muted">📞 {booking.user.phone_number}</p>
+                          )}
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          booking.status === 'accepted' ? 'bg-green-500/20 text-green-500' :
+                          booking.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' :
+                          booking.status === 'rejected' ? 'bg-red-500/20 text-red-500' :
+                          'bg-gray-500/20 text-gray-500'
+                        }`}>
+                          {booking.status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <p className="text-foreground-muted">Quantity: <span className="font-medium text-foreground-default">{booking.quantity}</span></p>
+                        <p className="text-foreground-muted">
+                          Payment: <span className={`font-medium ${booking.payment_verified ? 'text-green-500' : 'text-red-500'}`}>
+                            {booking.payment_verified ? '✓ Verified' : '✗ Not Verified'}
+                          </span>
+                        </p>
+                        <p className="text-foreground-muted col-span-2">
+                          Booked: {new Date(booking.created_at).toLocaleDateString('en-IN', { 
+                            day: 'numeric', 
+                            month: 'short', 
+                            year: 'numeric' 
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
         </div>
       )}
     </DashboardLayout>

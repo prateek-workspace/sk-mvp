@@ -16,9 +16,18 @@ from config.settings import DATABASE_URL
 # If you're using Neon with sslmode=require, include that in the URL in settings.
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,
-    # Note: psycopg2 accepts sslmode in the URL; additional connect_args can be added if needed.
-    # connect_args={"sslmode": "require"},
+    pool_pre_ping=True,  # Verify connections before using - CRITICAL for Neon
+    pool_recycle=60,  # Recycle connections after 1 minute (Neon closes idle connections)
+    pool_size=5,  # Smaller pool size for serverless databases
+    max_overflow=10,  # Max overflow connections
+    connect_args={
+        "keepalives": 1,
+        "keepalives_idle": 30,
+        "keepalives_interval": 10,
+        "keepalives_count": 5,
+        "connect_timeout": 10,  # Connection timeout in seconds
+    },
+    echo=False,  # Set to True for SQL debugging
 )
 
 # Use scoped_session so short-lived sessions returned by helpers won't leak easily.

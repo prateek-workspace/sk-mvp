@@ -100,6 +100,7 @@ class AccountService:
                 "name": f"{user.first_name or ''} {user.last_name or ''}".strip() or user.email,
                 "is_superuser": bool(user.is_superuser),
                 "is_approved_lister": getattr(user, 'is_approved_lister', False),
+                "profile_image": user.profile_image,
                 "phone_number": user.phone_number,
                 "address": user.address,
                 "city": user.city,

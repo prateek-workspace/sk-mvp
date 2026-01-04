@@ -4,9 +4,12 @@ export interface User {
   id: number;
   email: string;
   name: string;
+  first_name?: string;
+  last_name?: string;
   role: 'user' | 'admin' | 'hostel' | 'coaching' | 'library' | 'tiffin';
   is_superuser?: boolean;
   is_approved_lister?: boolean;
+  profile_image?: string;
   phone_number?: string;
   address?: string;
   city?: string;
@@ -24,9 +27,11 @@ export interface Review {
 }
 
 export interface Faculty {
+  id?: number;
+  listing_id?: number;
   name: string;
   subject: string;
-  image: string;
+  image_url?: string;
 }
 
 // This type is now mainly for the mock data on the landing page.

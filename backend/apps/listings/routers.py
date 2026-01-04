@@ -54,20 +54,20 @@ def create_listing(
 ):
     """Create a new listing (approved listing owners only)"""
     # Check if user has listing role
-    if current_user["role"] not in ['hostel', 'coaching', 'library', 'tiffin']:
+    if current_user.role not in ['hostel', 'coaching', 'library', 'tiffin']:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 
             detail="Only users with listing roles can create listings"
         )
     
     # Check if user is approved
-    if not current_user.get("is_approved_lister", False):
+    if not current_user.is_approved_lister:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, 
             detail="Your account must be approved by admin before creating listings"
         )
     
-    return service.create_listing(data, owner_id=current_user["id"])
+    return service.create_listing(data, owner_id=current_user.id)
 
 
 @router.put("/{listing_id}", response_model=ListingOut)
@@ -82,7 +82,7 @@ def update_listing(
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
     
-    if listing.owner_id != current_user["id"]:
+    if listing.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this listing")
     
     updated_listing = service.update_listing(listing_id, data)
@@ -100,7 +100,7 @@ def delete_listing(
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
     
-    if listing.owner_id != current_user["id"]:
+    if listing.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this listing")
     
     service.delete_listing(listing_id)
@@ -119,16 +119,15 @@ async def upload_listing_image(
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
     
-    if listing.owner_id != current_user["id"]:
+    if listing.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to upload media for this listing")
     
-    # Upload to Cloudinary
-    cloudinary_service = CloudinaryService()
-    result = cloudinary_service.upload_image(
-        file=file.file, 
-        folder=f"listings/{listing_id}"
+    # Upload to Cloudinary (async call)
+    result = await CloudinaryService.upload_image(
+        file=file, 
+        folder=f"prephub/listings/{listing_id}"
     )
-    image_url = result["secure_url"]
+    image_url = result["url"]
     
     # Update listing with image URL
     service.update_listing(listing_id, ListingUpdate(image_url=image_url))

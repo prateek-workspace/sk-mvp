@@ -9,12 +9,16 @@ interface ListingDetailsModalProps {
   onBook: (listing: Listing) => void;
 }
 
-const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
-  <div className="flex items-center">
-    <Star className="w-4 h-4 text-yellow-500 fill-yellow-400 mr-1" />
-    <span className="text-foreground-default font-semibold">{rating.toFixed(1)}</span>
-  </div>
-);
+const StarRating: React.FC<{ rating?: number }> = ({ rating }) => {
+  if (!rating) return null;
+  
+  return (
+    <div className="flex items-center">
+      <Star className="w-4 h-4 text-yellow-500 fill-yellow-400 mr-1" />
+      <span className="text-foreground-default font-semibold">{rating.toFixed(1)}</span>
+    </div>
+  );
+};
 
 const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onClose, onBook }) => {
   if (!listing) return null;
@@ -42,7 +46,11 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
 
             <div className="overflow-y-auto flex-grow">
               <div className="h-72 w-full">
-                <img src={listing.image_url || listing.image || 'https://via.placeholder.com/800x400'} alt={listing.name} className="w-full h-full object-cover" />
+                <img 
+                  src={listing.image_url || 'https://placehold.co/800x400/E5E7EB/6B7280?text=No+Image'} 
+                  alt={listing.name} 
+                  className="w-full h-full object-cover" 
+                />
               </div>
               
               <div className="p-8 grid md:grid-cols-3 gap-8">

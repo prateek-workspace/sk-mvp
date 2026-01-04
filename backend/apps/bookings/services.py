@@ -1,11 +1,12 @@
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from datetime import datetime
 
 from apps.bookings.models import Booking
 from apps.bookings.schemas import BookingCreate, BookingUpdate, AdminSettingsUpdate
 from apps.core.models import AdminSettings
+from apps.accounts.models import User
 
 
 class BookingService:
@@ -13,8 +14,8 @@ class BookingService:
         self.db = db
 
     def list_bookings(self, user_id: Optional[int] = None, listing_id: Optional[int] = None) -> List[Booking]:
-        """List all bookings, optionally filtered by user or listing"""
-        query = select(Booking)
+        """List all bookings with user details, optionally filtered by user or listing"""
+        query = select(Booking).options(joinedload(Booking.user))
         
         if user_id:
             query = query.where(Booking.user_id == user_id)

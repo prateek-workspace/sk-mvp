@@ -45,6 +45,16 @@ class BookingStatusUpdate(BaseModel):
     status: str  # accepted or rejected
 
 
+class UserBasic(BaseModel):
+    id: int
+    email: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
 class BookingOut(BaseModel):
     id: int
     listing_id: int
@@ -58,6 +68,7 @@ class BookingOut(BaseModel):
     payment_verified_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+    user: Optional[UserBasic] = None
     
     model_config = ConfigDict(from_attributes=True)
 

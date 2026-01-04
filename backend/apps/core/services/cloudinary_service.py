@@ -23,13 +23,16 @@ class CloudinaryService:
     """
 
     @staticmethod
-    def upload_image(file: UploadFile, folder: str) -> dict:
+    def upload_image(file, folder: str) -> dict:
         """
         Upload image to Cloudinary
+        Accepts either UploadFile or file-like object
         """
-
+        # Handle both UploadFile and raw file objects
+        file_to_upload = file.file if hasattr(file, 'file') else file
+        
         result = cloudinary.uploader.upload(
-            file.file,
+            file_to_upload,
             folder=folder,
             resource_type="image",
         )

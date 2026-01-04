@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Building2,
   UserCog,
+  User as UserIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSidebar } from '../context/SidebarContext';
@@ -117,9 +118,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
 
         <div className="p-4 border-t border-border flex-shrink-0">
           <div className={`flex items-center space-x-3 p-2 rounded-lg hover:bg-surface transition-colors overflow-hidden ${isCollapsed ? 'justify-center' : ''}`}>
-            <img src={`https://i.pravatar.cc/150?u=${user?.id}`} alt={user?.full_name || 'User'} className="w-10 h-10 rounded-full flex-shrink-0" />
+            <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden bg-primary/10 flex items-center justify-center">
+              {user?.profile_image ? (
+                <img src={user.profile_image} alt={user?.name || 'User'} className="w-full h-full object-cover" />
+              ) : (
+                <UserIcon className="w-6 h-6 text-primary" />
+              )}
+            </div>
             <motion.div variants={textVariants} className="leading-tight whitespace-nowrap">
-              <p className="font-semibold text-sm text-foreground-default">{user?.full_name}</p>
+              <p className="font-semibold text-sm text-foreground-default">{user?.name}</p>
               <p className="text-xs text-foreground-muted capitalize">{user?.role} Account</p>
             </motion.div>
             <motion.button 

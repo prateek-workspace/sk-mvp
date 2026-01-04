@@ -60,21 +60,38 @@ class UserManager:
     # --------------------------------------------------------
     @staticmethod
     def get_user(user_id: int | None = None, email: str | None = None) -> User | None:
-        db: Session = SessionLocal()
+        """Get user by ID or email with connection retry logic"""
+        max_retries = 3
+        last_error = None
+        
+        for attempt in range(max_retries):
+            db: Session = SessionLocal()
+            try:
+                query = db.query(User)
 
-        try:
-            query = db.query(User)
+                if user_id:
+                    return query.filter(User.id == user_id).first()
 
-            if user_id:
-                return query.filter(User.id == user_id).first()
+                if email:
+                    return query.filter(User.email == email).first()
 
-            if email:
-                return query.filter(User.email == email).first()
+                return None
 
-            return None
-
-        finally:
-            db.close()
+            except Exception as e:
+                last_error = e
+                db.rollback()
+                if attempt < max_retries - 1:
+                    # Brief pause before retry
+                    import time
+                    time.sleep(0.1 * (attempt + 1))
+                    continue
+                else:
+                    raise
+            finally:
+                db.close()
+        
+        if last_error:
+            raise last_error
 
     @staticmethod
     def get_user_by_id(user_id: int) -> User | None:
@@ -125,6 +142,7 @@ class UserManager:
         password: str | None = None,
         first_name: str | None = None,
         last_name: str | None = None,
+        profile_image: str | None = None,
         phone_number: str | None = None,
         address: str | None = None,
         city: str | None = None,
@@ -149,6 +167,8 @@ class UserManager:
                 user.first_name = first_name
             if last_name is not None:
                 user.last_name = last_name
+            if profile_image is not None:
+                user.profile_image = profile_image
             if phone_number is not None:
                 user.phone_number = phone_number
             if address is not None:
@@ -214,7 +234,16 @@ class UserManager:
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
+            "profile_image": user.profile_image,
+            "phone_number": user.phone_number,
+            "address": user.address,
+            "city": user.city,
+            "state": user.state,
+            "pincode": user.pincode,
             "is_verified_email": user.is_verified_email,
+            "role": user.role,
+            "is_superuser": user.is_superuser,
+            "is_approved_lister": user.is_approved_lister,
             "date_joined": DateTime.string(user.date_joined),
             "updated_at": DateTime.string(user.updated_at),
             "last_login": DateTime.string(user.last_login),

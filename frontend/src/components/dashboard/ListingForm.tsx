@@ -162,87 +162,159 @@ const ListingForm: React.FC<ListingFormProps> = ({ user, existingListing, isEdit
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto bg-background p-8 rounded-xl border border-border">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto bg-background p-4 sm:p-6 lg:p-8 rounded-xl border border-border">
       {/* Basic Info */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div>
           <label className="form-label">Listing Name</label>
-          <input {...register('name', { required: 'Name is required' })} className="form-input" />
+          <input 
+            {...register('name', { required: 'Name is required' })} 
+            className="form-input" 
+            placeholder="Enter listing name"
+          />
           {errors.name && <p className="form-error">{errors.name.message}</p>}
         </div>
         <div>
           <label className="form-label">Price (per month)</label>
-          <input type="number" {...register('price', { required: 'Price is required', valueAsNumber: true })} className="form-input" />
+          <input 
+            type="number" 
+            {...register('price', { required: 'Price is required', valueAsNumber: true })} 
+            className="form-input" 
+            placeholder="Enter monthly price"
+          />
           {errors.price && <p className="form-error">{errors.price.message}</p>}
         </div>
         <div className="md:col-span-2">
           <label className="form-label">Location</label>
-          <input {...register('location')} className="form-input" />
+          <input 
+            {...register('location')} 
+            className="form-input" 
+            placeholder="Enter location (e.g., City, Area)"
+          />
         </div>
         <div className="md:col-span-2">
           <label className="form-label">Description</label>
-          <textarea {...register('description')} rows={4} className="form-input"></textarea>
+          <textarea 
+            {...register('description')} 
+            rows={4} 
+            className="form-input" 
+            placeholder="Describe your listing..."
+          />
         </div>
       </div>
 
       {/* Image Upload */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <label className="form-label">Main Image</label>
-        <div className="mt-2 flex items-center gap-6">
-          <div className="w-48 h-32 bg-surface rounded-lg flex items-center justify-center overflow-hidden">
+        <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="w-full sm:w-48 h-32 bg-surface rounded-lg flex items-center justify-center overflow-hidden border border-border">
             {imagePreview ? <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" /> : <UploadCloud className="w-8 h-8 text-foreground-muted" />}
           </div>
-          <input type="file" {...register('imageFile')} className="text-sm text-foreground-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+          <input 
+            type="file" 
+            {...register('imageFile')} 
+            accept="image/*"
+            className="text-sm text-foreground-muted w-full sm:w-auto file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 file:cursor-pointer" 
+          />
         </div>
       </div>
 
       {/* Features */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <label className="form-label">Features</label>
-        {featureFields.map((field, index) => (
-          <div key={field.id} className="flex items-center gap-2 mb-2">
-            <input {...register(`features.${index}.value`)} className="form-input flex-grow" placeholder={`Feature ${index + 1}`} />
-            <button type="button" onClick={() => removeFeature(index)} className="p-2 text-red-500 hover:bg-red-100 rounded-full"><Trash2 className="w-4 h-4" /></button>
-          </div>
-        ))}
-        <button type="button" onClick={() => appendFeature({ value: '' })} className="text-sm font-semibold text-primary flex items-center gap-1 mt-2">
+        <div className="space-y-2">
+          {featureFields.map((field, index) => (
+            <div key={field.id} className="flex items-center gap-2">
+              <input 
+                {...register(`features.${index}.value`)} 
+                className="form-input flex-grow" 
+                placeholder={`Feature ${index + 1}`} 
+              />
+              <button 
+                type="button" 
+                onClick={() => removeFeature(index)} 
+                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors flex-shrink-0"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button 
+          type="button" 
+          onClick={() => appendFeature({ value: '' })} 
+          className="text-sm font-semibold text-primary flex items-center gap-1 mt-3 hover:text-primary/80 transition-colors"
+        >
           <PlusCircle className="w-4 h-4" /> Add Feature
         </button>
       </div>
 
       {/* Faculty (Coaching only) */}
       {user.role === 'coaching' && (
-        <div className="mb-8 p-6 bg-surface rounded-lg border border-border">
-          <h3 className="font-semibold mb-4">Faculty Members</h3>
-          {facultyFields.map((field, index) => (
-            <div key={field.id} className="grid md:grid-cols-3 gap-4 mb-4 pb-4 border-b border-border last:border-b-0">
-              <div>
-                <label className="text-xs font-medium">Faculty Name</label>
-                <input {...register(`faculty.${index}.name`, { required: true })} className="form-input mt-1" />
-              </div>
-              <div>
-                <label className="text-xs font-medium">Subject</label>
-                <input {...register(`faculty.${index}.subject`)} className="form-input mt-1" />
-              </div>
-              <div className="flex items-end gap-2">
-                <div className="flex-grow">
-                  <label className="text-xs font-medium">Photo</label>
-                  <input type="file" {...register(`faculty.${index}.imageFile`)} className="form-input mt-1 text-xs p-1" />
+        <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-surface rounded-lg border border-border">
+          <h3 className="font-semibold text-foreground-default mb-4">Faculty Members</h3>
+          <div className="space-y-4">
+            {facultyFields.map((field, index) => (
+              <div key={field.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pb-4 border-b border-border last:border-b-0">
+                <div>
+                  <label className="text-xs font-medium text-foreground-default">Faculty Name</label>
+                  <input 
+                    {...register(`faculty.${index}.name`, { required: true })} 
+                    className="form-input mt-1" 
+                    placeholder="Enter name"
+                  />
                 </div>
-                <button type="button" onClick={() => removeFaculty(index)} className="p-2 text-red-500 hover:bg-red-100 rounded-full mb-1"><Trash2 className="w-4 h-4" /></button>
+                <div>
+                  <label className="text-xs font-medium text-foreground-default">Subject</label>
+                  <input 
+                    {...register(`faculty.${index}.subject`)} 
+                    className="form-input mt-1" 
+                    placeholder="Enter subject"
+                  />
+                </div>
+                <div className="sm:col-span-2 lg:col-span-1 flex items-end gap-2">
+                  <div className="flex-grow">
+                    <label className="text-xs font-medium text-foreground-default">Photo</label>
+                    <input 
+                      type="file" 
+                      {...register(`faculty.${index}.imageFile`)} 
+                      accept="image/*"
+                      className="form-input mt-1 text-xs p-2" 
+                    />
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => removeFaculty(index)} 
+                    className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors mb-1 flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-          <button type="button" onClick={() => appendFaculty({ name: '', subject: '' })} className="text-sm font-semibold text-primary flex items-center gap-1 mt-2">
+            ))}
+          </div>
+          <button 
+            type="button" 
+            onClick={() => appendFaculty({ name: '', subject: '' })} 
+            className="text-sm font-semibold text-primary flex items-center gap-1 mt-4 hover:text-primary/80 transition-colors"
+          >
             <PlusCircle className="w-4 h-4" /> Add Faculty
           </button>
         </div>
       )}
 
       {/* Submit Button */}
-      <div className="flex justify-end mt-8">
-        <button type="submit" disabled={isSubmitting} className="flex items-center justify-center w-36 h-12 px-6 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors disabled:bg-rose-400">
-          {isSubmitting ? <Loader2 className="animate-spin" /> : (isEditMode ? 'Save Changes' : 'Create Listing')}
+      <div className="flex justify-end mt-6 sm:mt-8">
+        <button 
+          type="submit" 
+          disabled={isSubmitting} 
+          className="flex items-center justify-center min-w-[144px] h-11 sm:h-12 px-6 sm:px-8 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-all duration-200 disabled:bg-rose-400 disabled:cursor-not-allowed shadow-sm"
+        >
+          {isSubmitting ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            isEditMode ? 'Save Changes' : 'Create Listing'
+          )}
         </button>
       </div>
     </form>
