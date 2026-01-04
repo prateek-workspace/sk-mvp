@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { User as UserIcon, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { 
+  User as UserIcon, Mail, Phone, MapPin, Save, Edit2, Lock, 
+  Trash2, Camera, Upload, Eye, EyeOff, AlertTriangle 
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import { AuthService } from '../services/auth.service';
 import api from '../utils/api';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const SettingsPage: React.FC = () => {
   const { role } = useParams<{ role: string }>();
-  const { user, setAuth, token } = useAuth();
+  const { user, setAuth, token, logout } = useAuth();
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'danger'>('profile');
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -21,6 +32,21 @@ const SettingsPage: React.FC = () => {
     state: '',
     pincode: '',
   });
+
+  const [passwordData, setPasswordData] = useState({
+    current_password: '',
+    password: '',
+    password_confirm: '',
+  });
+
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -38,6 +64,10 @@ const SettingsPage: React.FC = () => {
         state: user.state || '',
         pincode: user.pincode || '',
       });
+      
+      // Load profile image if exists (placeholder for now)
+      // TODO: Implement actual profile image storage
+      setProfileImage(null);
     }
   }, [user]);
 
@@ -46,6 +76,34 @@ const SettingsPage: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordData({
+      ...passwordData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,11 +127,69 @@ const SettingsPage: React.FC = () => {
       }
       
       toast.success('Profile updated successfully!');
+      setIsEditing(false);
     } catch (error: any) {
       console.error('Profile update error:', error);
       toast.error(error.message || 'Failed to update profile');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (passwordData.password !== passwordData.password_confirm) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    if (passwordData.password.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await api.patch('/accounts/me/password', {
+        old_password: passwordData.current_password,
+        password: passwordData.password,
+        password_confirm: passwordData.password_confirm,
+      });
+      
+      toast.success('Password changed successfully! Please login again.');
+      
+      // Logout user after password change
+      setTimeout(() => {
+        logout();
+        navigate('/login');
+      }, 2000);
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      toast.error(error.message || 'Failed to change password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== 'DELETE') {
+      toast.error('Please type DELETE to confirm');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await api.delete('/accounts/me');
+      toast.success('Account deleted successfully');
+      logout();
+      navigate('/');
+    } catch (error: any) {
+      console.error('Account deletion error:', error);
+      toast.error(error.message || 'Failed to delete account');
+    } finally {
+      setIsLoading(false);
+      setShowDeleteModal(false);
     }
   };
 
