@@ -94,7 +94,7 @@ const BookingQRModal: React.FC<BookingQRModalProps> = ({ isOpen, onClose, bookin
 
               {/* QR Code */}
               <div className="flex flex-col items-center space-y-4">
-                <div className="bg-white p-4 rounded-xl shadow-md">
+                <div className="bg-surface p-4 rounded-xl shadow-md border border-border">
                   <QRCodeSVG value={bookingData.qr_code} size={200} />
                 </div>
                 <div className="text-center">

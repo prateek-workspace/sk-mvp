@@ -157,7 +157,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                         <img
                           src={settings.payment_qr_code}
                           alt="Payment QR Code"
-                          className="w-64 h-64 object-contain border-2 border-border rounded-lg bg-white"
+                          className="w-64 h-64 object-contain border-2 border-border rounded-lg bg-surface"
                         />
                       </div>
                       <div className="flex-1 space-y-3">
@@ -178,7 +178,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                               disabled={uploading}
                               className="hidden"
                             />
-                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30">
                               {uploading ? (
                                 <>
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -219,7 +219,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                         disabled={uploading}
                         className="hidden"
                       />
-                      <span className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                      <span className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30">>
                         {uploading ? (
                           <>
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -266,7 +266,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
 
                 <button
                   onClick={handleUpiUpdate}
-                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
                 >
                   Save UPI ID
                 </button>

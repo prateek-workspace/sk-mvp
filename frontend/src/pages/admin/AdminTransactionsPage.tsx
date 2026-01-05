@@ -219,75 +219,141 @@ const AdminTransactionsPage: React.FC = () => {
               No transactions found
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-surface">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">User</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Listing</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Qty</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Payment</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-surface transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground-default">
-                        #{transaction.id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-foreground-default">{transaction.user_email}</div>
-                        <div className="text-xs text-foreground-muted">{transaction.user_name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-foreground-default">{transaction.listing_name}</div>
-                        <div className="text-xs text-foreground-muted capitalize">{transaction.listing_type}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground-default">
-                        ₹{transaction.amount.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-muted">
-                        {transaction.quantity}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(transaction.status)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          {transaction.payment_verified ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" title="Verified" />
-                          ) : transaction.payment_id || transaction.payment_screenshot ? (
-                            <Clock className="w-4 h-4 text-yellow-500" title="Pending verification" />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-red-500" title="No payment proof" />
-                          )}
-                          <span className="text-xs text-foreground-muted">
-                            {transaction.payment_id ? `ID: ${transaction.payment_id.slice(0, 10)}...` : 'No ID'}
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden divide-y divide-border">
+                {filteredTransactions.map((transaction) => (
+                  <motion.div
+                    key={transaction.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="p-4 hover:bg-surface transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium text-foreground-default mb-1">
+                          {transaction.listing_name}
+                        </h3>
+                        <p className="text-xs text-foreground-muted capitalize mb-2">
+                          {transaction.listing_type}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {getStatusBadge(transaction.status)}
+                          <span className="px-2 py-1 text-xs font-medium text-foreground-default bg-surface rounded-full">
+                            ₹{transaction.amount.toLocaleString('en-IN')}
                           </span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-muted">
-                        {new Date(transaction.created_at).toLocaleDateString('en-IN')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => setSelectedTransaction(transaction)}
-                          className="text-primary hover:text-blue-700 font-medium inline-flex items-center gap-1"
-                        >
-                          <Eye className="w-4 h-4" />
-                          View
-                        </button>
-                      </td>
+                      </div>
+                    </div>
+                    <div className="space-y-1 mb-3 text-xs">
+                      <p className="text-foreground-muted">
+                        User: <span className="text-foreground-default font-medium">{transaction.user_name}</span>
+                      </p>
+                      <p className="text-foreground-muted">
+                        Email: <span className="text-foreground-default">{transaction.user_email}</span>
+                      </p>
+                      <p className="text-foreground-muted">
+                        Quantity: <span className="text-foreground-default font-medium">{transaction.quantity}</span>
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-foreground-muted">Payment:</span>
+                        {transaction.payment_verified ? (
+                          <CheckCircle className="w-3 h-3 text-green-500" />
+                        ) : transaction.payment_id || transaction.payment_screenshot ? (
+                          <Clock className="w-3 h-3 text-yellow-500" />
+                        ) : (
+                          <XCircle className="w-3 h-3 text-red-500" />
+                        )}
+                        <span className="text-foreground-default text-xs">
+                          {transaction.payment_verified ? 'Verified' : transaction.payment_id || transaction.payment_screenshot ? 'Pending' : 'No proof'}
+                        </span>
+                      </div>
+                      <p className="text-foreground-muted">
+                        Date: <span className="text-foreground-default">{new Date(transaction.created_at).toLocaleDateString('en-IN')}</span>
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedTransaction(transaction)}
+                      className="w-full inline-flex items-center justify-center text-primary hover:text-rose-600 font-medium text-sm py-2 px-4 bg-surface rounded-lg"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Details
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-surface">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">User</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Listing</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Qty</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Payment</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredTransactions.map((transaction) => (
+                      <tr key={transaction.id} className="hover:bg-surface transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground-default">
+                          #{transaction.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-foreground-default">{transaction.user_email}</div>
+                          <div className="text-xs text-foreground-muted">{transaction.user_name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-foreground-default">{transaction.listing_name}</div>
+                          <div className="text-xs text-foreground-muted capitalize">{transaction.listing_type}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground-default">
+                          ₹{transaction.amount.toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-muted">
+                          {transaction.quantity}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(transaction.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            {transaction.payment_verified ? (
+                              <CheckCircle className="w-4 h-4 text-green-500" title="Verified" />
+                            ) : transaction.payment_id || transaction.payment_screenshot ? (
+                              <Clock className="w-4 h-4 text-yellow-500" title="Pending verification" />
+                            ) : (
+                              <XCircle className="w-4 h-4 text-red-500" title="No payment proof" />
+                            )}
+                            <span className="text-xs text-foreground-muted">
+                              {transaction.payment_id ? `ID: ${transaction.payment_id.slice(0, 10)}...` : 'No ID'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground-muted">
+                          {new Date(transaction.created_at).toLocaleDateString('en-IN')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button
+                            onClick={() => setSelectedTransaction(transaction)}
+                            className="text-primary hover:text-rose-600 font-medium inline-flex items-center gap-1"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -430,7 +496,7 @@ const AdminTransactionsPage: React.FC = () => {
                 )}
                 <button
                   onClick={() => setSelectedTransaction(null)}
-                  className="flex-1 py-2 bg-surface text-foreground-default rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-2 bg-surface text-foreground-default rounded-lg font-semibold hover:bg-border transition-colors"
                 >
                   Close
                 </button>

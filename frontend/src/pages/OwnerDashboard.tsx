@@ -258,7 +258,7 @@ const OwnerDashboard: React.FC = () => {
               </Link>
               <Link
                 to={`/dashboard/${user?.role}/listings/new`}
-                className="flex items-center justify-between p-4 bg-primary text-white hover:bg-blue-700 rounded-lg transition-colors"
+                className="flex items-center justify-between p-4 bg-primary text-white hover:bg-rose-600 rounded-lg transition-colors shadow-lg shadow-primary/30"
               >
                 <div className="flex items-center gap-3">
                   <Plus className="w-5 h-5" />

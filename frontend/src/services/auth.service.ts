@@ -46,20 +46,21 @@ export class AuthService {
     formData.append('username', email);
     formData.append('password', password);
 
-    const response = await api.post(
-      '/accounts/login',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/accounts/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData,
+    });
 
-    // Save token globally
-    api.setToken(response.access_token);
+    const data = await response.json();
 
-    return response;
+    if (!response.ok) {
+      throw new Error(data.detail || 'Login failed');
+    }
+
+    return data;
   }
 
   // --------------------
@@ -77,15 +78,7 @@ export class AuthService {
   static async verifyOTP(
     data: VerifyOTPRequest
   ): Promise<VerifyOTPResponse> {
-    const response = await api.patch(
-      '/accounts/register/verify',
-      data
-    );
-
-    // Save token after verification
-    api.setToken(response.access_token);
-
-    return response;
+    return api.patch('/accounts/register/verify', data);
   }
 
   // --------------------
@@ -94,11 +87,12 @@ export class AuthService {
   static async getCurrentUser(): Promise<User> {
     const response: CurrentUserResponse = await api.get('/accounts/me');
     const userData = response.user;
-
+    
+    // Map backend user_id to frontend id and extract name fields
     const firstName = (userData as any).first_name || '';
     const lastName = (userData as any).last_name || '';
     const fullName = `${firstName} ${lastName}`.trim();
-
+    
     return {
       id: (userData as any).user_id || (userData as any).id,
       email: userData.email,
@@ -118,46 +112,24 @@ export class AuthService {
     };
   }
 
-  // --------------------
-  // LOGOUT
-  // --------------------
   static async logout(): Promise<void> {
-    await api.post('/accounts/logout', {});
-    api.setToken(null);
+    return api.post('/accounts/logout', {});
   }
 
-  // --------------------
-  // UPDATE PROFILE
-  // --------------------
-  static async updateProfile(
-    data: Partial<User>
-  ): Promise<User> {
-    const response: CurrentUserResponse = await api.put(
-      '/accounts/me',
-      data
-    );
+  static async updateProfile(data: Partial<User>): Promise<User> {
+    const response: CurrentUserResponse = await api.put('/accounts/me', data);
     return response.user;
   }
 
-  // --------------------
-  // CHANGE PASSWORD
-  // --------------------
-  static async changePassword(
-    oldPassword: string,
-    newPassword: string,
-    confirmPassword: string
-  ): Promise<void> {
-    await api.patch('/accounts/me/password', {
+  static async changePassword(oldPassword: string, newPassword: string, confirmPassword: string): Promise<void> {
+    return api.patch('/accounts/me/password', {
       old_password: oldPassword,
       password: newPassword,
       password_confirm: confirmPassword,
     });
   }
 
-  // --------------------
-  // RESEND OTP
-  // --------------------
   static async resendOTP(email: string): Promise<void> {
-    await api.post('/accounts/otp', { email });
+    return api.post('/accounts/otp', { email });
   }
 }

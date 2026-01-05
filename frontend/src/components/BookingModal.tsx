@@ -296,7 +296,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
 
                 <button
                   onClick={() => setStep('payment')}
-                  className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
                 >
                   Continue to Payment
                 </button>
@@ -334,7 +334,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                     <img 
                       src={paymentQR} 
                       alt="Payment QR Code" 
-                      className="w-64 h-64 mx-auto object-contain border-2 border-border rounded-lg bg-white"
+                      className="w-64 h-64 mx-auto object-contain border-2 border-border rounded-lg bg-surface"
                     />
                     {paymentUPI && (
                       <div className="mt-4">
@@ -391,7 +391,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                             <img 
                               src={paymentScreenshot} 
                               alt="Payment screenshot" 
-                              className="w-full h-64 object-contain bg-white"
+                              className="w-full h-64 object-contain bg-surface rounded-lg"
                             />
                           </div>
                           <div className="flex gap-2">
@@ -424,7 +424,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                           <div className="flex gap-2">
                             <button
                               onClick={capturePhoto}
-                              className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2"
+                              className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
                             >
                               <Camera className="w-5 h-5" />
                               Capture Photo
@@ -496,7 +496,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                   <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
                   >
                     {loading ? (
                       <>

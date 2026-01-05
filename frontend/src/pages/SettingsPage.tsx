@@ -247,7 +247,7 @@ const SettingsPage: React.FC = () => {
                 </div>
                 <button
                   onClick={handleImageClick}
-                  className="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+                  className="absolute bottom-0 right-0 p-2 bg-primary text-white rounded-full shadow-lg hover:bg-rose-600 transition-colors"
                   title="Change profile picture"
                 >
                   <Camera className="w-4 h-4" />
@@ -328,8 +328,8 @@ const SettingsPage: React.FC = () => {
                 onClick={() => setIsEditing(!isEditing)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
                   isEditing
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'bg-primary text-white hover:bg-blue-700'
+                    ? 'bg-surface text-foreground-default hover:bg-border'
+                    : 'bg-primary text-white hover:bg-rose-600 shadow-lg shadow-primary/30'
                 }`}
               >
                 <Edit2 className="w-4 h-4" />
@@ -522,7 +522,7 @@ const SettingsPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30"
                   >
                     <Save className="w-5 h-5" />
                     {isLoading ? 'Saving...' : 'Save Changes'}
@@ -623,7 +623,7 @@ const SettingsPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30"
               >
                 <Lock className="w-5 h-5" />
                 {isLoading ? 'Changing Password...' : 'Change Password'}

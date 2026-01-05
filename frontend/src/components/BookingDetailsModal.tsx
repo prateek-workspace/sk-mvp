@@ -201,7 +201,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
                     <img
                       src={booking.payment_screenshot}
                       alt="Payment proof"
-                      className="w-full h-auto max-h-96 object-contain bg-white"
+                      className="w-full h-auto max-h-96 object-contain bg-surface rounded-lg"
                     />
                   </div>
                 </div>
@@ -238,7 +238,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
         <div className="sticky bottom-0 bg-surface border-t border-border px-6 py-4">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
           >
             Close
           </button>

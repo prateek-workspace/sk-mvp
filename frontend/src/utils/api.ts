@@ -2,8 +2,8 @@ declare const importMeta: any;
 // Vite exposes env on import.meta.env. If VITE_API_URL isn't provided, default
 // to the common dev backend address so the frontend doesn't call the wrong host
 // (causing 404s). You can override by setting VITE_API_URL in frontend/.env.
-const env = import.meta.env
-const API_BASE = env.VITE_API_URL;
+const env = (import.meta as any)?.env || {};
+const API_BASE = env.VITE_API_URL || 'http://localhost:8000';
 if (!env.VITE_API_URL) {
   // Helpful warning in dev so you know which base is being used
   // eslint-disable-next-line no-console
@@ -58,17 +58,14 @@ class API {
     return data;
   }
 
-  async post(path: string, body: any, options?: { headers?: Record<string, string> }) {
-    const isFormUrlEncoded = options?.headers?.['Content-Type'] === 'application/x-www-form-urlencoded';
-    
+  async post(path: string, body: any) {
     const res = await fetch(`${this.base}${path}`, {
       method: 'POST',
       headers: {
-        ...(isFormUrlEncoded ? {} : { 'Content-Type': 'application/json' }),
+        'Content-Type': 'application/json',
         ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
-        ...(options?.headers || {}),
       },
-      body: isFormUrlEncoded ? body.toString() : JSON.stringify(body),
+      body: JSON.stringify(body),
     });
     const text = await res.text();
     let data: any = null;

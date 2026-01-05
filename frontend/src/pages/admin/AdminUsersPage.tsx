@@ -165,84 +165,144 @@ const AdminUsersPage: React.FC = () => {
               {searchTerm || roleFilter !== 'all' ? 'No users match your filters' : 'No users found'}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-surface">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Joined
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredUsers.map((user) => (
-                    <motion.tr
-                      key={user.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="hover:bg-surface transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <div className="text-sm font-medium text-foreground-default">
-                            {user.name}
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden divide-y divide-border">
+                {filteredUsers.map((user) => (
+                  <motion.div
+                    key={user.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="p-4 hover:bg-surface transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium text-foreground-default mb-1">
+                          {user.name}
+                        </h3>
+                        <p className="text-xs text-foreground-muted mb-2">{user.email}</p>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            roleColors[user.role] || 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {user.role}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-3 text-xs">
+                      <span className={user.is_active ? 'text-green-600' : 'text-red-600'}>
+                        {user.is_active ? '✓ Active' : '✗ Inactive'}
+                      </span>
+                      <span className="text-foreground-muted">•</span>
+                      <span className={user.is_verified_email ? 'text-green-600' : 'text-yellow-600'}>
+                        {user.is_verified_email ? '✓ Verified' : '⏳ Unverified'}
+                      </span>
+                      {['hostel', 'coaching', 'library', 'tiffin'].includes(user.role) && (
+                        <>
+                          <span className="text-foreground-muted">•</span>
+                          <span className={user.is_approved_lister ? 'text-green-600' : 'text-yellow-600'}>
+                            {user.is_approved_lister ? '✓ Approved' : '⏳ Pending'}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-foreground-muted">
+                        Joined {new Date(user.date_joined).toLocaleDateString('en-IN')}
+                      </span>
+                      <button
+                        onClick={() => navigate(`/admin/users/${user.id}`)}
+                        className="inline-flex items-center text-primary hover:text-rose-600 font-medium"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-surface">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        User
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Joined
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredUsers.map((user) => (
+                      <motion.tr
+                        key={user.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="hover:bg-surface transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <div className="text-sm font-medium text-foreground-default">
+                              {user.name}
+                            </div>
+                            <div className="text-xs text-foreground-muted">{user.email}</div>
                           </div>
-                          <div className="text-xs text-foreground-muted">{user.email}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          roleColors[user.role] || 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col space-y-1">
-                          <span className={`text-xs ${user.is_active ? 'text-green-600' : 'text-red-600'}`}>
-                            {user.is_active ? '✓ Active' : '✗ Inactive'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            roleColors[user.role] || 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {user.role}
                           </span>
-                          <span className={`text-xs ${user.is_verified_email ? 'text-green-600' : 'text-yellow-600'}`}>
-                            {user.is_verified_email ? '✓ Verified' : '⏳ Unverified'}
-                          </span>
-                          {['hostel', 'coaching', 'library', 'tiffin'].includes(user.role) && (
-                            <span className={`text-xs ${user.is_approved_lister ? 'text-green-600' : 'text-yellow-600'}`}>
-                              {user.is_approved_lister ? '✓ Approved' : '⏳ Pending'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col space-y-1">
+                            <span className={`text-xs ${user.is_active ? 'text-green-600' : 'text-red-600'}`}>
+                              {user.is_active ? '✓ Active' : '✗ Inactive'}
                             </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-foreground-muted">
-                          {new Date(user.date_joined).toLocaleDateString('en-IN')}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => navigate(`/admin/users/${user.id}`)}
-                          className="inline-flex items-center text-primary hover:text-blue-700 font-medium"
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View Details
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                            <span className={`text-xs ${user.is_verified_email ? 'text-green-600' : 'text-yellow-600'}`}>
+                              {user.is_verified_email ? '✓ Verified' : '⏳ Unverified'}
+                            </span>
+                            {['hostel', 'coaching', 'library', 'tiffin'].includes(user.role) && (
+                              <span className={`text-xs ${user.is_approved_lister ? 'text-green-600' : 'text-yellow-600'}`}>
+                                {user.is_approved_lister ? '✓ Approved' : '⏳ Pending'}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-foreground-muted">
+                            {new Date(user.date_joined).toLocaleDateString('en-IN')}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button
+                            onClick={() => navigate(`/admin/users/${user.id}`)}
+                            className="inline-flex items-center text-primary hover:text-rose-600 font-medium"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            View Details
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>

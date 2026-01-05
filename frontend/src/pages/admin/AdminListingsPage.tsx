@@ -173,96 +173,153 @@ const AdminListingsPage: React.FC = () => {
               {searchTerm || typeFilter !== 'all' ? 'No listings match your filters' : 'No listings found'}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-surface">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Listing
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Owner
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Price
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Bookings
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredListings.map((listing) => (
-                    <motion.tr
-                      key={listing.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="hover:bg-surface transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <div className="text-sm font-medium text-foreground-default">
-                            {listing.name}
-                          </div>
-                          <div className="text-xs text-foreground-muted">
-                            {listing.location || 'No location'}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          typeColors[listing.type] || 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {listing.type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <div className="text-sm text-foreground-default">
-                            {listing.owner_name || 'N/A'}
-                          </div>
-                          <div className="text-xs text-foreground-muted">
-                            {listing.owner_email}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-foreground-default">
-                          ₹{listing.price.toLocaleString('en-IN')}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="text-sm text-foreground-default font-medium">
-                            {listing.total_bookings} total
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden divide-y divide-border">
+                {filteredListings.map((listing) => (
+                  <motion.div
+                    key={listing.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="p-4 hover:bg-surface transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium text-foreground-default mb-1">
+                          {listing.name}
+                        </h3>
+                        <p className="text-xs text-foreground-muted mb-2">
+                          {listing.location || 'No location'}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            typeColors[listing.type] || 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {listing.type}
                           </span>
-                          {listing.pending_bookings > 0 && (
-                            <span className="text-xs text-yellow-600">
-                              {listing.pending_bookings} pending
-                            </span>
-                          )}
+                          <span className="px-2 py-1 text-xs font-medium text-foreground-default bg-surface rounded-full">
+                            ₹{listing.price.toLocaleString('en-IN')}
+                          </span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => navigate(`/admin/listings/${listing.id}`)}
-                          className="inline-flex items-center text-primary hover:text-blue-700 font-medium"
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View Details
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1 mb-3 text-xs">
+                      <p className="text-foreground-muted">
+                        Owner: <span className="text-foreground-default font-medium">{listing.owner_name || 'N/A'}</span>
+                      </p>
+                      <p className="text-foreground-muted">
+                        Email: <span className="text-foreground-default">{listing.owner_email}</span>
+                      </p>
+                      <p className="text-foreground-muted">
+                        Bookings: <span className="text-foreground-default font-medium">{listing.total_bookings} total</span>
+                        {listing.pending_bookings > 0 && (
+                          <span className="text-yellow-600"> ({listing.pending_bookings} pending)</span>
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/admin/listings/${listing.id}`)}
+                      className="w-full inline-flex items-center justify-center text-primary hover:text-rose-600 font-medium text-sm py-2 px-4 bg-surface rounded-lg"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Details
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-surface">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Listing
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Owner
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Bookings
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredListings.map((listing) => (
+                      <motion.tr
+                        key={listing.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="hover:bg-surface transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <div className="text-sm font-medium text-foreground-default">
+                              {listing.name}
+                            </div>
+                            <div className="text-xs text-foreground-muted">
+                              {listing.location || 'No location'}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            typeColors[listing.type] || 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {listing.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <div className="text-sm text-foreground-default">
+                              {listing.owner_name || 'N/A'}
+                            </div>
+                            <div className="text-xs text-foreground-muted">
+                              {listing.owner_email}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-foreground-default">
+                            ₹{listing.price.toLocaleString('en-IN')}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex flex-col">
+                            <span className="text-sm text-foreground-default font-medium">
+                              {listing.total_bookings} total
+                            </span>
+                            {listing.pending_bookings > 0 && (
+                              <span className="text-xs text-yellow-600">
+                                {listing.pending_bookings} pending
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button
+                            onClick={() => navigate(`/admin/listings/${listing.id}`)}
+                            className="inline-flex items-center text-primary hover:text-rose-600 font-medium"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            View Details
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>

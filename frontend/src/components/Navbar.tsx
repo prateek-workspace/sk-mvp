@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-2">
             <ThemeToggle />
             {user ? (
-               <div className="flex items-center gap-4">
+               <div className="flex items-center gap-2 sm:gap-4">
                 <Link to={getDashboardLink()} className="flex items-center gap-2 text-sm font-semibold text-foreground-default hover:text-primary transition-colors">
                     <UserIcon className="w-5 h-5" />
                     <span className="hidden sm:inline">Dashboard</span>
@@ -82,10 +82,11 @@ const Navbar: React.FC = () => {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/signup"
-                    className="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition-colors flex items-center gap-2 shadow-lg shadow-primary/30"
+                    className="px-3 sm:px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-rose-600 transition-colors flex items-center gap-2 shadow-lg shadow-primary/30"
                   >
                     <PlusCircle className="w-4 h-4" />
                     <span className="hidden sm:inline">Post Listing</span>
+                    <span className="sm:hidden">Join</span>
                   </Link>
                 </motion.div>
               </div>

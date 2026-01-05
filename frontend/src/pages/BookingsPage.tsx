@@ -214,7 +214,7 @@ const BookingsPage: React.FC = () => {
                               e.stopPropagation();
                               setSelectedBooking(booking);
                             }}
-                            className="text-primary hover:text-blue-700 font-medium inline-flex items-center gap-1 text-sm"
+                            className="text-primary hover:text-rose-600 font-medium inline-flex items-center gap-1 text-sm"
                           >
                             <Eye className="w-4 h-4" />
                             View

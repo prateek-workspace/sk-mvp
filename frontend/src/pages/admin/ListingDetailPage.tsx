@@ -130,7 +130,7 @@ const ListingDetailPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate('/admin/listings')}
-            className="flex items-center text-primary hover:text-blue-700 font-medium"
+            className="flex items-center text-primary hover:text-rose-600 font-medium"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Listings
@@ -139,7 +139,7 @@ const ListingDetailPage: React.FC = () => {
           <div className="flex gap-3">
             <button
               onClick={() => navigate(`/listings/${id}/edit`)}
-              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
             >
               <Edit className="w-4 h-4 mr-2" />
               Edit Listing
@@ -472,7 +472,7 @@ const ListingDetailPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 py-2 bg-surface text-foreground-default rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                className="flex-1 py-2 bg-surface text-foreground-default rounded-lg font-semibold hover:bg-border transition-colors"
               >
                 Cancel
               </button>

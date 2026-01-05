@@ -117,7 +117,7 @@ const UserDetailPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate('/admin/users')}
-            className="flex items-center text-primary hover:text-blue-700 font-medium"
+            className="flex items-center text-primary hover:text-rose-600 font-medium"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Users

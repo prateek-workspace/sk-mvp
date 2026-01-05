@@ -81,7 +81,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                     <>
                       <button
                         onClick={() => viewPaymentProof(booking)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2 text-sm"
+                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center space-x-2 text-sm shadow-lg shadow-primary/30"
                       >
                         <Eye className="w-4 h-4" />
                         <span>View Proof</span>

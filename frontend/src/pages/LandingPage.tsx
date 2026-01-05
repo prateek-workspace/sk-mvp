@@ -322,8 +322,8 @@ const LandingPage: React.FC = () => {
                 <h4 className="font-semibold text-white mb-4">Subscribe to Our Newsletter</h4>
                 <p className="text-sm mb-4">Stay updated with the latest listings and rental tips.</p>
                 <div className="flex gap-2">
-                  <input type="email" placeholder="Email Address" className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary" />
-                  <button className="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600">Subscribe</button>
+                  <input type="email" placeholder="Email Address" className="w-full px-4 py-2 rounded-lg bg-surface border border-border text-foreground-default focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <button className="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 shadow-lg shadow-primary/30">Subscribe</button>
                 </div>
               </div>
             </div>
