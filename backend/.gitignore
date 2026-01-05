@@ -126,6 +126,7 @@ idea/
 /media/
 .env
 .venv
+.venv/
 env/
 venv/
 ENV/
