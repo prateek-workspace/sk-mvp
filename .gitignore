@@ -6,6 +6,9 @@ __pycache__/
 
 # C extensions
 *.so
+# others
+schema.sql
+api.md 
 
 # Distribution / packaging
 .Python
