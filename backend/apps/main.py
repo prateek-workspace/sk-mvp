@@ -11,15 +11,16 @@ logger = logging.getLogger("fastapi_app")
 app = FastAPI(
     title="FastAPI Shop",
     version="0.1.0",
-    redirect_slashes=False,   # ⬅️ VERY IMPORTANT (prevents 307)
+    redirect_slashes=False,   #  VERY IMPORTANT (prevents 307)
 )
 
-# ✅ CORS FIX
+#  CORS FIX
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://sp-aroma.netlify.app",
-        "https://sp-aroma.com",
+        "https://skstudentpath.netlify.app",
+        "https://skstudentpath.com",
+        "https://www.skstudentpath.com",
         "http://localhost:5173",          # Vite dev server
         "http://localhost:3000",          # Alternative dev port
         "http://127.0.0.1:5173",
