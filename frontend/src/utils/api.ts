@@ -1,13 +1,11 @@
-declare const importMeta: any;
-// Vite exposes env on import.meta.env. If VITE_API_URL isn't provided, default
-// to the common dev backend address so the frontend doesn't call the wrong host
-// (causing 404s). You can override by setting VITE_API_URL in frontend/.env.
-const env = (import.meta as any)?.env || {};
-const API_BASE = env.VITE_API_URL || 'http://localhost:8000';
-if (!env.VITE_API_URL) {
-  // Helpful warning in dev so you know which base is being used
-  // eslint-disable-next-line no-console
-  console.warn('[api] VITE_API_URL not set — defaulting API base to', API_BASE);
+// Vite exposes env on import.meta.env. VITE_API_URL must be set in .env file
+const env = import.meta.env;
+const API_BASE = env.VITE_API_URL;
+
+if (!API_BASE) {
+  throw new Error(
+    'VITE_API_URL is not set. Please create a .env file in the frontend directory with VITE_API_URL=<your-api-url>'
+  );
 }
 
 class API {

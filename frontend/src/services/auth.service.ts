@@ -46,7 +46,12 @@ export class AuthService {
     formData.append('username', email);
     formData.append('password', password);
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/accounts/login`, {
+    const API_BASE = import.meta.env.VITE_API_URL;
+    if (!API_BASE) {
+      throw new Error('VITE_API_URL is not configured');
+    }
+
+    const response = await fetch(`${API_BASE}/accounts/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
