@@ -1,12 +1,15 @@
-// Vite exposes env on import.meta.env. VITE_API_URL must be set in .env file
+// Vite exposes env on import.meta.env. VITE_API_URL must be set
 const env = import.meta.env;
 const API_BASE = env.VITE_API_URL;
 
 if (!API_BASE) {
-  throw new Error(
-    'VITE_API_URL is not set. Please create a .env file in the frontend directory with VITE_API_URL=<your-api-url>'
+  console.error(
+    'VITE_API_URL is not set!\n' +
+    'Local dev: Create a .env file with VITE_API_URL=http://localhost:8000\n' +
+    'Netlify: Add VITE_API_URL in Site settings → Build & deploy → Environment variables'
   );
 }
+
 
 class API {
   base: string;
