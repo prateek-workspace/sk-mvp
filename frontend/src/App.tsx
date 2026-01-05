@@ -70,7 +70,7 @@ function App() {
                 <Route path="/dashboard/library" element={<OwnerDashboard />} />
                 <Route path="/dashboard/tiffin" element={<OwnerDashboard />} />
                 <Route path="/dashboard/:role" element={<Dashboard />} />
-                
+
                 {/* Admin routes */}
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/listings" element={<AdminListingsPage />} />
@@ -79,20 +79,20 @@ function App() {
                 <Route path="/admin/users/:id" element={<UserDetailPage />} />
                 <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
                 <Route path="/admin/payment-settings" element={<AdminPaymentSettingsPage />} />
-                
+
                 {/* Common routes */}
                 <Route path="/dashboard/:role/bookings" element={<BookingsPage />} />
                 <Route path="/dashboard/:role/listings" element={<ManageListingsPage />} />
                 <Route path="/dashboard/:role/listings/new" element={<ListingFormPage />} />
                 <Route path="/dashboard/:role/listings/edit/:listingId" element={<ListingFormPage />} />
                 <Route path="/dashboard/:role/settings" element={<SettingsPage />} />
-                
+
                 <Route path="/listings/new" element={<ListingFormPage />} />
                 <Route path="/listings/:id/edit" element={<ListingFormPage />} />
                 <Route path="/bookings" element={<BookingsPage />} />
                 <Route path="/manage-listings" element={<ManageListingsPage />} />
               </Route>
-              
+
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
