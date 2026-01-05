@@ -58,14 +58,17 @@ class API {
     return data;
   }
 
-  async post(path: string, body: any, p0: { headers: { 'Content-Type': string; }; }) {
+  async post(path: string, body: any, options?: { headers?: Record<string, string> }) {
+    const isFormUrlEncoded = options?.headers?.['Content-Type'] === 'application/x-www-form-urlencoded';
+    
     const res = await fetch(`${this.base}${path}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormUrlEncoded ? {} : { 'Content-Type': 'application/json' }),
         ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+        ...(options?.headers || {}),
       },
-      body: JSON.stringify(body),
+      body: isFormUrlEncoded ? body.toString() : JSON.stringify(body),
     });
     const text = await res.text();
     let data: any = null;
