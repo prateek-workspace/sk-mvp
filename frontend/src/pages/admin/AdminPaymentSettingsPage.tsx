@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Upload, QrCode, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -219,7 +218,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                         disabled={uploading}
                         className="hidden"
                       />
-                      <span className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30">>
+                      <span className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30">
                         {uploading ? (
                           <>
                             <Loader2 className="w-5 h-5 animate-spin" />

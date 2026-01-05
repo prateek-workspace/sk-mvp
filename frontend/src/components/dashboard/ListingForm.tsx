@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { User } from '../../types';
 import { PlusCircle, Trash2, UploadCloud, Loader2 } from 'lucide-react';
-import { ListingsService } from '../../services/listings.service';
 import api from '../../utils/api';
 
 type Faculty = {
@@ -46,7 +45,7 @@ type FormData = {
   }[];
 };
 
-const ListingForm: React.FC<ListingFormProps> = ({ user, existingListing, isEditMode }) => {
+const ListingForm = ({ user, existingListing, isEditMode }: ListingFormProps) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,8 +55,8 @@ const ListingForm: React.FC<ListingFormProps> = ({ user, existingListing, isEdit
       description: existingListing?.description || '',
       price: existingListing?.price || 0,
       location: existingListing?.location || '',
-      features: existingListing?.features?.map(f => ({ value: f })) || [{ value: '' }],
-      faculty: existingListing?.faculty?.map(f => ({ name: f.name, subject: f.subject || '', image_url: f.image_url || '' })) || [],
+      features: existingListing?.features?.map((f: string) => ({ value: f })) || [{ value: '' }],
+      faculty: existingListing?.faculty?.map((f: Faculty) => ({ name: f.name, subject: f.subject || '', image_url: f.image_url || '' })) || [],
     },
   });
 
