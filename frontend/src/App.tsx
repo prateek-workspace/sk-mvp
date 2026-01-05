@@ -22,6 +22,8 @@ import AdminListingsPage from './pages/admin/AdminListingsPage';
 import ListingDetailPage from './pages/admin/ListingDetailPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import UserDetailPage from './pages/admin/UserDetailPage';
+import AdminTransactionsPage from './pages/admin/AdminTransactionsPage';
+import AdminPaymentSettingsPage from './pages/admin/AdminPaymentSettingsPage';
 
 function App() {
   return (
@@ -75,6 +77,8 @@ function App() {
                 <Route path="/admin/listings/:id" element={<ListingDetailPage />} />
                 <Route path="/admin/users" element={<AdminUsersPage />} />
                 <Route path="/admin/users/:id" element={<UserDetailPage />} />
+                <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
+                <Route path="/admin/payment-settings" element={<AdminPaymentSettingsPage />} />
                 
                 {/* Common routes */}
                 <Route path="/dashboard/:role/bookings" element={<BookingsPage />} />

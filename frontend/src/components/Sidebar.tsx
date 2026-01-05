@@ -13,6 +13,8 @@ import {
   User as UserIcon,
   Home,
   Search,
+  DollarSign,
+  QrCode,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSidebar } from '../context/SidebarContext';
@@ -50,6 +52,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Building2, label: 'Manage Listings', path: '/admin/listings' },
     { icon: UserCog, label: 'Manage Users', path: '/admin/users' },
+    { icon: DollarSign, label: 'Transactions', path: '/admin/transactions' },
+    { icon: QrCode, label: 'Payment Settings', path: '/admin/payment-settings' },
     { icon: Settings, label: 'Settings', path: `/dashboard/${role}/settings` },
   ];
 

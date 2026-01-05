@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Clock, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Loader2, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
+import BookingDetailsModal from '../components/BookingDetailsModal';
 import { BookingsService } from '../services/bookings.service';
 import toast from 'react-hot-toast';
 
@@ -30,6 +31,7 @@ const BookingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -162,13 +164,13 @@ const BookingsPage: React.FC = () => {
                 <th className="px-6 py-4 text-left font-semibold text-foreground-muted">{user.role === 'user' ? 'Service' : 'Customer'}</th>
                 <th className="px-6 py-4 text-left font-semibold text-foreground-muted hidden sm:table-cell">Amount</th>
                 <th className="px-6 py-4 text-left font-semibold text-foreground-muted">Status</th>
-                {user.role !== 'user' && <th className="px-6 py-4 text-left font-semibold text-foreground-muted">Actions</th>}
+                <th className="px-6 py-4 text-left font-semibold text-foreground-muted">{user.role === 'user' ? 'View' : 'Actions'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {paginatedBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={user.role === 'user' ? 4 : 5} className="px-6 py-16 text-center text-foreground-muted">
+                  <td colSpan={5} className="px-6 py-16 text-center text-foreground-muted">
                     {filteredBookings.length === 0 && statusFilter !== 'all' 
                       ? `No ${statusFilter} bookings found`
                       : 'No bookings found'}
@@ -182,7 +184,8 @@ const BookingsPage: React.FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="hover:bg-surface"
+                      className="hover:bg-surface cursor-pointer"
+                      onClick={() => setSelectedBooking(booking)}
                     >
                       <td className="px-6 py-4 font-mono text-xs text-foreground-muted hidden md:table-cell">{booking.id}</td>
                       <td className="px-6 py-4">
@@ -195,14 +198,27 @@ const BookingsPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 font-semibold text-foreground-default hidden sm:table-cell">₹{(booking.total_amount || 0).toLocaleString('en-IN')}</td>
                       <td className="px-6 py-4">{getStatusPill(booking.status)}</td>
-                      {user?.role !== 'user' && (
-                        <td className="px-6 py-4">
+                      {user?.role !== 'user' ? (
+                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                           {booking.status === 'pending' ? (
                             <div className="flex space-x-2">
                               <button onClick={() => handleStatusUpdate(booking.id, 'accepted')} className="px-3 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 dark:bg-green-900/50 dark:text-green-400 dark:hover:bg-green-900 text-xs font-semibold">Accept</button>
                               <button onClick={() => handleStatusUpdate(booking.id, 'rejected')} className="px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 dark:bg-red-900/50 dark:text-red-400 dark:hover:bg-red-900 text-xs font-semibold">Reject</button>
                             </div>
                           ) : null}
+                        </td>
+                      ) : (
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedBooking(booking);
+                            }}
+                            className="text-primary hover:text-blue-700 font-medium inline-flex items-center gap-1 text-sm"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View
+                          </button>
                         </td>
                       )}
                     </motion.tr>
@@ -253,6 +269,14 @@ const BookingsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Booking Details Modal */}
+      {selectedBooking && (
+        <BookingDetailsModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+        />
+      )}
     </DashboardLayout>
   );
 };

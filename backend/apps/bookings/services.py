@@ -25,6 +25,40 @@ class BookingService:
         result = self.db.execute(query)
         return list(result.scalars().all())
 
+    def list_bookings_with_details(self) -> List[dict]:
+        """List all bookings with detailed user and listing information"""
+        query = select(Booking).options(
+            joinedload(Booking.user),
+            joinedload(Booking.listing)
+        )
+        
+        result = self.db.execute(query)
+        bookings = result.scalars().all()
+        
+        # Transform to dict with all required details
+        detailed_bookings = []
+        for booking in bookings:
+            detailed_bookings.append({
+                "id": booking.id,
+                "listing_id": booking.listing_id,
+                "listing_name": booking.listing.name if booking.listing else "Unknown",
+                "listing_type": booking.listing.type if booking.listing else "Unknown",
+                "user_id": booking.user_id,
+                "user_email": booking.user.email if booking.user else "Unknown",
+                "user_name": f"{booking.user.first_name or ''} {booking.user.last_name or ''}".strip() if booking.user else "Unknown",
+                "status": booking.status,
+                "amount": float(booking.amount),
+                "quantity": booking.quantity,
+                "payment_id": booking.payment_id,
+                "payment_screenshot": booking.payment_screenshot,
+                "payment_verified": booking.payment_verified,
+                "payment_verified_at": booking.payment_verified_at.isoformat() if booking.payment_verified_at else None,
+                "created_at": booking.created_at.isoformat() if booking.created_at else None,
+                "updated_at": booking.updated_at.isoformat() if booking.updated_at else None,
+            })
+        
+        return detailed_bookings
+
     def get_booking(self, booking_id: int) -> Optional[Booking]:
         """Get a single booking by ID"""
         return self.db.get(Booking, booking_id)

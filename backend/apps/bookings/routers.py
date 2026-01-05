@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
 from sqlalchemy.orm import Session
 
 from apps.bookings.schemas import (
@@ -9,6 +9,7 @@ from apps.bookings.schemas import (
 from apps.bookings.services import BookingService, AdminSettingsService
 from apps.accounts.services.authenticate import AccountService
 from apps.accounts.models import User
+from apps.core.cloudinary_service import CloudinaryService
 from config.database import get_db
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
@@ -123,17 +124,17 @@ async def list_bookings(
     return {"bookings": bookings, "total": len(bookings)}
 
 
-@router.get("/admin/all", response_model=BookingListOut)
+@router.get("/admin/all")
 def list_all_bookings_admin(
     current_user: User = Depends(AccountService.current_user),
     service: BookingService = Depends(get_booking_service),
 ):
-    """Admin can view all bookings"""
+    """Admin can view all bookings with detailed user and listing information"""
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
     
-    bookings = service.list_bookings()
-    return {"bookings": bookings, "total": len(bookings)}
+    bookings = service.list_bookings_with_details()
+    return bookings
 
 
 @router.get("/{booking_id}", response_model=BookingOut)
@@ -194,7 +195,7 @@ def delete_booking(
 
 
 # Admin endpoints for payment verification and settings
-@router.patch("/admin/{booking_id}/verify-payment", response_model=BookingOut)
+@router.patch("/{booking_id}/verify-payment", response_model=BookingOut)
 def verify_payment(
     booking_id: int,
     data: PaymentVerificationUpdate,
@@ -210,6 +211,23 @@ def verify_payment(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
     
     return service.verify_payment(booking_id, data.payment_verified)
+
+
+@router.post("/admin/upload-qr")
+async def upload_qr_code(
+    file: UploadFile = File(...),
+    current_user: User = Depends(AccountService.current_user),
+):
+    """Admin uploads QR code image to Cloudinary"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    
+    try:
+        # Upload to Cloudinary
+        result = await CloudinaryService.upload_image(file, folder="prephub/payment_qr_codes")
+        return {"url": result['url']}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get("/admin/settings", response_model=AdminSettingsOut)

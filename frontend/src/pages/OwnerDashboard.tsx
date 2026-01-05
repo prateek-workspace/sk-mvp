@@ -1,56 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Plus, Edit, Trash2, Building2, BookOpen, Coffee, Home } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { 
+  Plus, 
+  Building2, 
+  BookOpen, 
+  Coffee, 
+  Home, 
+  TrendingUp, 
+  DollarSign, 
+  Users, 
+  FileText,
+  Clock,
+  CheckCircle
+} from 'lucide-react';
 import api from '../utils/api';
-import { Listing } from '../types';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 
+interface AnalyticsOverview {
+  total_listings: number;
+  active_listings: number;
+  total_bookings: number;
+  period_bookings: number;
+  unique_customers: number;
+  total_revenue: number;
+  period_revenue: number;
+  pending_bookings: number;
+  avg_booking_value: number;
+}
+
+interface TrendData {
+  label: string;
+  value: number;
+}
+
+interface AnalyticsData {
+  overview: AnalyticsOverview;
+  bookings_by_status: Record<string, number>;
+  trends: {
+    bookings: TrendData[];
+    revenue: TrendData[];
+  };
+  period: string;
+}
+
 const OwnerDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [listings, setListings] = useState<Listing[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    bookings: 0,
-  });
+  const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
 
   useEffect(() => {
     if (user) {
-      fetchListings();
+      fetchAnalytics();
     }
-  }, [user]);
+  }, [user, period]);
 
-  const fetchListings = async () => {
+  const fetchAnalytics = async () => {
     try {
-      const data = await api.get('/listings/');
-      // Filter by owner (current user)
-      const myListings = data.filter((l: Listing) => l.owner_id === user?.id);
-      setListings(myListings);
-      setStats({
-        total: myListings.length,
-        active: myListings.filter((l: Listing) => l.is_active).length,
-        bookings: 0, // TODO: fetch bookings count
-      });
+      setLoading(true);
+      const data = await api.get(`/analytics/owner?period=${period}`);
+      setAnalytics(data);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to fetch listings');
+      console.error('Error fetching analytics:', error);
+      toast.error(error.message || 'Failed to fetch analytics');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this listing?')) return;
-
-    try {
-      await api.delete(`/listings/${id}`);
-      toast.success('Listing deleted successfully');
-      setListings(listings.filter(l => l.id !== id));
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to delete listing');
-    }
+  const formatCurrency = (amount: number) => {
+    return `₹${amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
   };
 
   const getRoleIcon = () => {
@@ -83,6 +105,18 @@ const OwnerDashboard: React.FC = () => {
     }
   };
 
+  if (loading || !analytics) {
+    return (
+      <DashboardLayout role={user?.role || 'hostel'} pageTitle={getRoleTitle()}>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const { overview, bookings_by_status, trends } = analytics;
+
   return (
     <DashboardLayout role={user?.role || 'hostel'} pageTitle={getRoleTitle()}>
       <div className="space-y-6">
@@ -90,134 +124,218 @@ const OwnerDashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground-default">{getRoleTitle()}</h1>
-            <p className="text-foreground-muted mt-1">Manage your listings and bookings</p>
+            <p className="text-foreground-muted mt-1">Monitor your business performance</p>
           </div>
-          {getRoleIcon()}
+          <div className="flex items-center gap-2">
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as 'week' | 'month' | 'year')}
+              className="px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground-default"
+            >
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+              <option value="year">Last Year</option>
+            </select>
+          </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Total Listings"
+            value={overview.total_listings}
+            icon={<Building2 className="w-8 h-8" />}
+            color="blue"
+          />
+          <StatCard
+            title="Total Bookings"
+            value={overview.total_bookings}
+            icon={<FileText className="w-8 h-8" />}
+            color="purple"
+          />
+          <StatCard
+            title="Unique Customers"
+            value={overview.unique_customers}
+            icon={<Users className="w-8 h-8" />}
+            color="green"
+          />
+          <StatCard
+            title="Pending Bookings"
+            value={overview.pending_bookings}
+            icon={<Clock className="w-8 h-8" />}
+            color="orange"
+          />
+        </div>
+
+        {/* Revenue Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-background border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-foreground-muted">Total Listings</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
-              </div>
-              <Building2 className="w-8 h-8 text-blue-500" />
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-green-100">Total Revenue</p>
+              <DollarSign className="w-6 h-6" />
             </div>
+            <p className="text-3xl font-bold">{formatCurrency(overview.total_revenue)}</p>
           </div>
-          <div className="bg-background border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-foreground-muted">Active Listings</p>
-                <p className="text-2xl font-bold">{stats.active}</p>
-              </div>
-              <Building2 className="w-8 h-8 text-green-500" />
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-blue-100">Period Revenue</p>
+              <TrendingUp className="w-6 h-6" />
             </div>
+            <p className="text-3xl font-bold">{formatCurrency(overview.period_revenue)}</p>
           </div>
-          <div className="bg-background border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-foreground-muted">Total Bookings</p>
-                <p className="text-2xl font-bold">{stats.bookings}</p>
-              </div>
-              <Building2 className="w-8 h-8 text-purple-500" />
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-purple-100">Avg Booking Value</p>
+              <DollarSign className="w-6 h-6" />
             </div>
+            <p className="text-3xl font-bold">{formatCurrency(overview.avg_booking_value)}</p>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          <Link
-            to={`/dashboard/${user?.role}/listings`}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Manage Listings
-          </Link>
-        </div>
-
-        {/* Listings Table */}
-        <div className="bg-background border border-border rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-border">
-            <h2 className="text-xl font-semibold text-foreground-default">My Listings</h2>
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bookings Trend */}
+          <div className="bg-background border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground-default mb-4">Bookings Trend</h3>
+            <div className="h-64">
+              <SimpleBarChart data={trends.bookings} color="rgb(59, 130, 246)" />
+            </div>
           </div>
 
-          {loading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          {/* Revenue Trend */}
+          <div className="bg-background border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground-default mb-4">Revenue Trend</h3>
+            <div className="h-64">
+              <SimpleBarChart 
+                data={trends.revenue} 
+                color="rgb(34, 197, 94)" 
+                formatValue={formatCurrency}
+              />
             </div>
-          ) : listings.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-foreground-muted mb-4">You haven't created any listings yet</p>
+          </div>
+
+          {/* Bookings by Status */}
+          <div className="bg-background border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground-default mb-4">Bookings by Status</h3>
+            <div className="space-y-4 mt-6">
+              {Object.entries(bookings_by_status).map(([status, count]) => (
+                <div key={status} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {status === 'accepted' && <CheckCircle className="w-5 h-5 text-green-500" />}
+                    {status === 'pending' && <Clock className="w-5 h-5 text-yellow-500" />}
+                    {status === 'rejected' && <span className="w-5 h-5 text-red-500">✕</span>}
+                    <span className="capitalize text-foreground-default">{status}</span>
+                  </div>
+                  <span className="font-bold text-foreground-default">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-background border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-foreground-default mb-4">Quick Actions</h3>
+            <div className="space-y-3">
               <Link
                 to={`/dashboard/${user?.role}/listings`}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="flex items-center justify-between p-4 bg-surface hover:bg-primary/10 rounded-lg transition-colors group"
               >
-                <Plus className="w-5 h-5" />
-                Go to My Listings
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  <span className="font-medium text-foreground-default">Manage Listings</span>
+                </div>
+                <span className="text-foreground-muted group-hover:text-primary">→</span>
+              </Link>
+              <Link
+                to={`/dashboard/${user?.role}/bookings`}
+                className="flex items-center justify-between p-4 bg-surface hover:bg-primary/10 rounded-lg transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-primary" />
+                  <span className="font-medium text-foreground-default">View All Bookings</span>
+                </div>
+                <span className="text-foreground-muted group-hover:text-primary">→</span>
+              </Link>
+              <Link
+                to={`/dashboard/${user?.role}/listings/new`}
+                className="flex items-center justify-between p-4 bg-primary text-white hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Plus className="w-5 h-5" />
+                  <span className="font-medium">Create New Listing</span>
+                </div>
+                <span>→</span>
               </Link>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-surface">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-foreground-muted uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {listings.map((listing) => (
-                    <tr key={listing.id} className="hover:bg-surface transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-foreground-default">{listing.name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {listing.type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-foreground-muted">{listing.location}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-foreground-default">₹{listing.price}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${listing.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                          {listing.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex gap-2">
-                          <Link
-                            to={`/listings/${listing.id}/edit`}
-                            className="text-primary hover:text-blue-700"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(listing.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </DashboardLayout>
+  );
+};
+
+// Stat Card Component
+interface StatCardProps {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+  color: 'blue' | 'green' | 'purple' | 'orange';
+}
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => {
+  const colorClasses = {
+    blue: 'text-blue-500',
+    green: 'text-green-500',
+    purple: 'text-purple-500',
+    orange: 'text-orange-500',
+  };
+
+  return (
+    <div className="bg-background border border-border rounded-lg p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-foreground-muted">{title}</p>
+          <p className="text-3xl font-bold text-foreground-default mt-1">{value}</p>
+        </div>
+        <div className={colorClasses[color]}>{icon}</div>
+      </div>
+    </div>
+  );
+};
+
+// Simple Bar Chart Component
+interface SimpleBarChartProps {
+  data: TrendData[];
+  color: string;
+  formatValue?: (value: number) => string;
+}
+
+const SimpleBarChart: React.FC<SimpleBarChartProps> = ({ data, color, formatValue }) => {
+  const maxValue = Math.max(...data.map(d => d.value), 1);
+
+  return (
+    <div className="h-full flex flex-col justify-end">
+      <div className="flex items-end justify-between gap-2 h-full">
+        {data.map((item, index) => (
+          <div key={index} className="flex-1 flex flex-col items-center gap-2">
+            <div className="relative w-full flex items-end h-full">
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: `${(item.value / maxValue) * 100}%` }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="w-full rounded-t-lg relative group"
+                style={{ backgroundColor: color, minHeight: item.value > 0 ? '4px' : '0' }}
+              >
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {formatValue ? formatValue(item.value) : item.value}
+                </div>
+              </motion.div>
+            </div>
+            <span className="text-xs text-foreground-muted text-center">{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

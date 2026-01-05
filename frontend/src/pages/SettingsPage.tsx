@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { 
   User as UserIcon, Mail, Phone, MapPin, Save, Edit2, Lock, 
-  Trash2, Camera, Upload, Eye, EyeOff, AlertTriangle 
+  Trash2, Camera, Eye, EyeOff, AlertTriangle 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
@@ -13,7 +13,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const SettingsPage: React.FC = () => {
   const { role } = useParams<{ role: string }>();
-  const { user, setAuth, token, logout } = useAuth();
+  const { user, setAuth, token, signOut } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -21,7 +21,6 @@ const SettingsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
     first_name: '',
@@ -105,7 +104,7 @@ const SettingsPage: React.FC = () => {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await api.upload('/accounts/me/upload-image', formData);
+        await api.upload('/accounts/me/upload-image', formData);
         
         // Update user context with new image
         const updatedUser = await AuthService.getCurrentUser();
@@ -137,7 +136,7 @@ const SettingsPage: React.FC = () => {
         Object.entries(formData).filter(([_, value]) => value !== '')
       );
 
-      const response = await api.put('/accounts/me', { user: updateData });
+      await api.put('/accounts/me', { user: updateData });
       
       // Fetch updated user data
       const updatedUser = await AuthService.getCurrentUser();
@@ -193,7 +192,7 @@ const SettingsPage: React.FC = () => {
       
       // Logout user after password change
       setTimeout(() => {
-        logout();
+        signOut();
         navigate('/login');
       }, 2000);
     } catch (error: any) {
@@ -214,7 +213,7 @@ const SettingsPage: React.FC = () => {
     try {
       await api.delete('/accounts/me');
       toast.success('Account deleted successfully');
-      logout();
+      signOut();
       navigate('/');
     } catch (error: any) {
       console.error('Account deletion error:', error);
@@ -344,30 +343,40 @@ const SettingsPage: React.FC = () => {
                   <label className="form-label">
                     First Name
                   </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="form-input disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "Enter first name" : "Not set"}
-                  />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="first_name"
+                      value={formData.first_name}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Enter first name"
+                    />
+                  ) : (
+                    <div className="form-input disabled:opacity-60 disabled:cursor-not-allowed bg-surface">
+                      {formData.first_name || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="form-label">
                     Last Name
                   </label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="form-input disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "Enter last name" : "Not set"}
-                  />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="last_name"
+                      value={formData.last_name}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Enter last name"
+                    />
+                  ) : (
+                    <div className="form-input disabled:opacity-60 disabled:cursor-not-allowed bg-surface">
+                      {formData.last_name || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -390,36 +399,52 @@ const SettingsPage: React.FC = () => {
                 <label className="block text-sm font-medium mb-2 text-foreground-muted">
                   Phone Number
                 </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-muted" />
-                  <input
-                    type="tel"
-                    name="phone_number"
-                    value={formData.phone_number}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "+91 1234567890" : "Not set"}
-                  />
-                </div>
+                {isEditing ? (
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-muted" />
+                    <input
+                      type="tel"
+                      name="phone_number"
+                      value={formData.phone_number}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="+91 1234567890"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-muted" />
+                    <div className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg opacity-60">
+                      {formData.phone_number || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2 text-foreground-muted">
                   Address
                 </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-4 w-5 h-5 text-foreground-muted" />
-                  <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={3}
-                    className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "Enter your address" : "Not set"}
-                  />
-                </div>
+                {isEditing ? (
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-4 w-5 h-5 text-foreground-muted" />
+                    <textarea
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                      placeholder="Enter your address"
+                    />
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-4 w-5 h-5 text-foreground-muted" />
+                    <div className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg opacity-60 min-h-[90px]">
+                      {formData.address || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -427,46 +452,61 @@ const SettingsPage: React.FC = () => {
                   <label className="block text-sm font-medium mb-2 text-foreground-muted">
                     City
                   </label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "City" : "Not set"}
-                  />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="City"
+                    />
+                  ) : (
+                    <div className="w-full px-4 py-3 bg-surface border border-border rounded-lg opacity-60">
+                      {formData.city || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2 text-foreground-muted">
                     State
                   </label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "State" : "Not set"}
-                  />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="State"
+                    />
+                  ) : (
+                    <div className="w-full px-4 py-3 bg-surface border border-border rounded-lg opacity-60">
+                      {formData.state || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2 text-foreground-muted">
                     Pincode
                   </label>
-                  <input
-                    type="text"
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    maxLength={6}
-                    className="w-full px-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    placeholder={isEditing ? "123456" : "Not set"}
-                  />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="pincode"
+                      value={formData.pincode}
+                      onChange={handleChange}
+                      maxLength={6}
+                      className="w-full px-4 py-3 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="123456"
+                    />
+                  ) : (
+                    <div className="w-full px-4 py-3 bg-surface border border-border rounded-lg opacity-60">
+                      {formData.pincode || <span className="text-foreground-muted">Not set</span>}
+                    </div>
+                  )}
                 </div>
               </div>
 

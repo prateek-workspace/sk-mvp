@@ -186,7 +186,7 @@ const ManageListingsPage: React.FC = () => {
       <div className="flex justify-end mb-6">
         <Link
           to={`/dashboard/${role}/listings/new`}
-            {paginatedListings.map((listing, idx) => (px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
         >
           <Plus className="w-5 h-5" />
           Create New Listing
@@ -201,7 +201,7 @@ const ManageListingsPage: React.FC = () => {
       ) : (
         <div className="bg-background rounded-xl border border-border overflow-hidden shadow-sm">
           <ul className="divide-y divide-border">
-            {listings.map((listing, idx) => (
+            {paginatedListings.map((listing, idx) => (
               <motion.li
                 key={listing.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -258,19 +258,19 @@ const ManageListingsPage: React.FC = () => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className=\"flex items-center justify-between px-6 py-4 border-t border-border\">
-              <div className=\"text-sm text-foreground-muted\">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+              <div className="text-sm text-foreground-muted">
                 Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, listings.length)} of {listings.length} listings
               </div>
-              <div className=\"flex items-center gap-2\">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className=\"p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors\"
+                  className="p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronLeft className=\"w-5 h-5\" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-                <div className=\"flex items-center gap-1\">
+                <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                     <button
                       key={page}
@@ -288,9 +288,9 @@ const ManageListingsPage: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className=\"p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors\"
+                  className="p-2 rounded-lg hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <ChevronRight className=\"w-5 h-5\" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             </div>
