@@ -9,23 +9,28 @@ class EmailService:
 
     app = AppConfig.get_config()
 
+    if not app.resend_api_key:
+        raise RuntimeError("RESEND_API_KEY is not set")
+
+    if not app.resend_from_email:
+        raise RuntimeError("RESEND_FROM_EMAIL is not set")
+
     resend.api_key = app.resend_api_key
 
     @classmethod
     def send(cls, subject: str, html: str, to: str):
-        """
-        Generic email sender via Resend.
-        """
+        if not cls.app.resend_api_key or not cls.app.resend_from_email:
+            raise RuntimeError("Email service is not configured")
+
         try:
             resend.Emails.send({
                 "from": f"{cls.app.project_name} <{cls.app.resend_from_email}>",
                 "to": [to],
                 "subject": subject,
-                "html": html
+                "html": html,
             })
         except Exception as e:
-            print("❌ Error sending email:", e)
-            raise
+            raise RuntimeError("Failed to send email via Resend") from e
 
     @classmethod
     def register_send_verification_email(cls, to_address: str):
