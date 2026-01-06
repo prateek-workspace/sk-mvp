@@ -62,8 +62,9 @@ export class BookingsService {
   }
 
   static async getAllBookingsAdmin(): Promise<Booking[]> {
-    const response: BookingsResponse = await api.get('/bookings/admin/all');
-    return response.bookings;
+    const response = await api.get('/bookings/admin/all');
+    // Backend returns array directly, not wrapped in object
+    return Array.isArray(response) ? response : [];
   }
 
   static async updateBooking(id: number, data: Partial<BookingCreateRequest>): Promise<Booking> {

@@ -33,10 +33,11 @@ const AdminPaymentVerificationPage: React.FC = () => {
     try {
       setLoading(true);
       const data = await BookingsService.getAllBookingsAdmin();
-      setBookings(data);
+      setBookings(Array.isArray(data) ? data : []);
     } catch (error: any) {
       console.error('Failed to load bookings:', error);
       toast.error('Failed to load bookings');
+      setBookings([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -71,7 +72,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
     setShowModal(true);
   };
 
-  const filteredBookings = bookings.filter(booking => {
+  const filteredBookings = (bookings || []).filter(booking => {
     if (filter === 'unverified') return !booking.payment_verified && booking.payment_screenshot;
     if (filter === 'verified') return booking.payment_verified;
     return true;
@@ -101,7 +102,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
               : 'bg-surface text-foreground-muted hover:bg-primary/10'
           }`}
         >
-          Pending Verification ({bookings.filter(b => !b.payment_verified && b.payment_screenshot).length})
+          Pending Verification ({(bookings || []).filter(b => !b.payment_verified && b.payment_screenshot).length})
         </button>
         <button
           onClick={() => setFilter('verified')}
@@ -111,7 +112,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
               : 'bg-surface text-foreground-muted hover:bg-green-500/10'
           }`}
         >
-          Verified ({bookings.filter(b => b.payment_verified).length})
+          Verified ({(bookings || []).filter(b => b.payment_verified).length})
         </button>
         <button
           onClick={() => setFilter('all')}
@@ -121,7 +122,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
               : 'bg-surface text-foreground-muted hover:bg-gray-500/10'
           }`}
         >
-          All Bookings ({bookings.length})
+          All Bookings ({(bookings || []).length})
         </button>
       </div>
 
