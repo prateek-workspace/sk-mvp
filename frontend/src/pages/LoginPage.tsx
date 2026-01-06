@@ -70,7 +70,7 @@ const LoginPage: React.FC = () => {
         >
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-foreground-default">Sign In</h1>
-            <p className="text-foreground-muted mt-2">Welcome back to PrepHub!</p>
+            <p className="text-foreground-muted mt-2">Welcome back to SkStudentPath!</p>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-6">

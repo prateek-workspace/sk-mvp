@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
               <path d="M22.1668 21.3333C22.1668 24 19.8335 24 16.0002 24C12.1668 24 9.8335 24 9.8335 21.3333C9.8335 18.6667 12.1668 17 16.0002 17C19.8335 17 22.1668 18.6667 22.1668 21.3333Z" fill="white"/>
             </svg>
             <span className="text-xl font-bold text-foreground-default hidden sm:inline">
-              PrepHub
+              SkStudentPath
             </span>
           </Link>
 

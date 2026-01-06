@@ -93,7 +93,7 @@ const SignupPage: React.FC = () => {
               {showOtpInput ? 'Verify Email' : 'Create Account'}
             </h1>
             <p className="text-foreground-muted mt-2">
-              {showOtpInput ? 'Enter the OTP sent to your email' : 'Join PrepHub and find your perfect match.'}
+              {showOtpInput ? 'Enter the OTP sent to your email' : 'Join SkStudentPath and find your perfect match.'}
             </p>
           </div>
           

@@ -210,9 +210,9 @@ const LandingPage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-3xl font-bold text-foreground-default mb-4">About PrepHub</h2>
+              <h2 className="text-3xl font-bold text-foreground-default mb-4">About SkStudentPath</h2>
               <p className="text-foreground-muted mb-4">
-                Student Prep Hub was born from a simple idea: to make the journey of ambitious students easier. Finding the right coaching, a safe place to stay, and healthy food shouldn't be a hassle.
+                SkStudentPath was born from a simple idea: to make the journey of ambitious students easier. Finding the right coaching, a safe place to stay, and healthy food shouldn't be a hassle.
               </p>
               <p className="text-foreground-muted">
                 We are building India's largest online rental community, connecting students with verified service providers. Our mission is to provide a one-stop platform that is trustworthy, convenient, and tailored to the unique needs of students.
@@ -297,7 +297,7 @@ const LandingPage: React.FC = () => {
           >
             <div className="grid md:grid-cols-12 gap-8">
               <div className="md:col-span-4">
-                <h3 className="text-xl font-bold text-white mb-4">PrepHub</h3>
+                <h3 className="text-xl font-bold text-white mb-4">SkStudentPath</h3>
                 <p className="text-sm mb-4">India's largest platform designed to create an online rental community for students.</p>
               </div>
               <div className="md:col-span-2">
