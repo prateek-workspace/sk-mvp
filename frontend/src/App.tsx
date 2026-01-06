@@ -23,6 +23,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 import UserDetailPage from './pages/admin/UserDetailPage';
 import AdminTransactionsPage from './pages/admin/AdminTransactionsPage';
 import AdminPaymentSettingsPage from './pages/admin/AdminPaymentSettingsPage';
+import AdminPaymentVerificationPage from './pages/AdminPaymentVerificationPage';
 
 function App() {
   return (
@@ -78,6 +79,7 @@ function App() {
                 <Route path="/admin/users/:id" element={<UserDetailPage />} />
                 <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
                 <Route path="/admin/payment-settings" element={<AdminPaymentSettingsPage />} />
+                <Route path="/admin/payment-verification" element={<AdminPaymentVerificationPage />} />
                 
                 {/* Common routes */}
                 <Route path="/dashboard/:role/bookings" element={<BookingsPage />} />

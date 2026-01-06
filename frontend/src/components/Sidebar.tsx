@@ -15,6 +15,7 @@ import {
   Search,
   DollarSign,
   QrCode,
+  CheckCircle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSidebar } from '../context/SidebarContext';
@@ -52,6 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
     { icon: Building2, label: 'Manage Listings', path: '/admin/listings' },
     { icon: UserCog, label: 'Manage Users', path: '/admin/users' },
+    { icon: CheckCircle, label: 'Payment Verification', path: '/admin/payment-verification' },
     { icon: DollarSign, label: 'Transactions', path: '/admin/transactions' },
     { icon: QrCode, label: 'Payment Settings', path: '/admin/payment-settings' },
     { icon: Settings, label: 'Settings', path: `/dashboard/${role}/settings` },

@@ -59,12 +59,17 @@ export interface Booking {
   id: number;
   listing_id: number;
   user_id: number;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected' | 'waitlist';
   amount: number;
+  quantity: number;
   payment_id?: string;
   payment_screenshot?: string;
+  payment_verified: boolean;
+  payment_verified_at?: string;
   created_at: string;
   updated_at?: string;
+  listing?: Listing;
+  user?: User;
 }
 
 export interface BookingWithQR {

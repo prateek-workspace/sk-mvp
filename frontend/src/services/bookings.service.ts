@@ -3,8 +3,9 @@ import { Booking, BookingWithQR } from '../types';
 
 export interface BookingCreateRequest {
   listing_id: number;
-  amount: number;
-  status?: string;
+  quantity: number;
+  payment_id?: string;
+  payment_screenshot?: string;
 }
 
 export interface PaymentProofRequest {
@@ -13,7 +14,7 @@ export interface PaymentProofRequest {
 }
 
 export interface BookingStatusRequest {
-  status: 'accepted' | 'rejected';
+  status: 'accepted' | 'rejected' | 'waitlist';
 }
 
 export interface BookingsResponse {
@@ -21,7 +22,16 @@ export interface BookingsResponse {
   total: number;
 }
 
+export interface PaymentInfo {
+  payment_qr_code: string | null;
+  payment_upi_id: string | null;
+}
+
 export class BookingsService {
+  static async getPaymentInfo(): Promise<PaymentInfo> {
+    return api.get('/bookings/payment-info');
+  }
+
   static async createBooking(data: BookingCreateRequest): Promise<BookingWithQR> {
     return api.post('/bookings/', data);
   }
@@ -42,6 +52,13 @@ export class BookingsService {
 
   static async updateBookingStatus(bookingId: number, data: BookingStatusRequest): Promise<Booking> {
     return api.patch(`/bookings/${bookingId}/status`, data);
+  }
+
+  static async verifyPayment(bookingId: number, verified: boolean, notes?: string): Promise<Booking> {
+    return api.patch(`/bookings/${bookingId}/verify-payment`, {
+      payment_verified: verified,
+      notes,
+    });
   }
 
   static async getAllBookingsAdmin(): Promise<Booking[]> {

@@ -4,13 +4,12 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import ListingCard from '../components/ListingCard';
 import ListingDetailsModal from '../components/ListingDetailsModal';
-import BookingQRModal from '../components/BookingQRModal';
+import BookingModal from '../components/BookingModal';
 import Pagination from '../components/Pagination';
-import { Listing, BookingWithQR } from '../types';
+import { Listing } from '../types';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ListingsService } from '../services/listings.service';
-import { BookingsService } from '../services/bookings.service';
 
 const LISTINGS_PER_PAGE = 8;
 
@@ -19,8 +18,7 @@ const ListingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
-  const [bookingWithQR, setBookingWithQR] = useState<BookingWithQR | null>(null);
-  const [showQRModal, setShowQRModal] = useState(false);
+  const [bookingListing, setBookingListing] = useState<Listing | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,33 +65,22 @@ const ListingsPage: React.FC = () => {
     setSelectedListing(listing);
   };
 
-  const handleBookNow = async (listing: Listing) => {
+  const handleBookNow = (listing: Listing) => {
     if (!user || user.role !== 'user') {
       toast.error('Please login as a user to book services');
       navigate('/login');
       return;
     }
     
-    try {
-      const response = await BookingsService.createBooking({
-        listing_id: listing.id,
-        amount: listing.price,
-        status: 'pending'
-      });
-      
-      setSelectedListing(null);
-      setBookingWithQR(response);
-      setShowQRModal(true);
-      toast.success('Booking created! Please complete payment');
-    } catch (error: any) {
-      console.error('Failed to create booking:', error);
-      toast.error(error.message || 'Failed to create booking');
-    }
+    setSelectedListing(null);
+    setBookingListing(listing);
   };
 
-  const handlePaymentSubmit = () => {
-    toast.success('Payment proof submitted! Awaiting approval');
-    fetchListings(); // Refresh listings
+  const handleBookingSuccess = () => {
+    setBookingListing(null);
+    toast.success('Booking created successfully! Awaiting approval.');
+    // Optionally navigate to bookings page
+    // navigate('/dashboard/user/bookings');
   };
 
   const handlePageChange = (page: number) => {
@@ -173,12 +160,13 @@ const ListingsPage: React.FC = () => {
         onBook={handleBookNow}
       />
 
-      <BookingQRModal
-        isOpen={showQRModal}
-        onClose={() => setShowQRModal(false)}
-        bookingData={bookingWithQR}
-        onPaymentSubmit={handlePaymentSubmit}
-      />
+      {bookingListing && (
+        <BookingModal
+          listing={bookingListing}
+          onClose={() => setBookingListing(null)}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
     </div>
   );
 };

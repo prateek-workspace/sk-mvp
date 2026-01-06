@@ -1,24 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { X, MapPin, Calendar, DollarSign, Hash, CheckCircle, XCircle, Clock, ImageIcon } from 'lucide-react';
+import { Booking } from '../types';
 
 interface BookingDetailsModalProps {
-  booking: {
-    id: number;
-    listing: {
-      name: string;
-      type: string;
-      address?: string;
-      price: number;
-    };
-    status: string;
-    amount: number;
-    quantity: number;
-    payment_id?: string | null;
-    payment_screenshot?: string | null;
-    payment_verified: boolean;
-    created_at: string;
-  };
+  booking: Booking;
   onClose: () => void;
 }
 
@@ -90,17 +76,17 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
             <div className="bg-surface rounded-lg p-4 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-foreground-default text-lg">{booking.listing.name}</p>
-                  <p className="text-sm text-foreground-muted capitalize">{booking.listing.type}</p>
+                  <p className="font-semibold text-foreground-default text-lg">{booking.listing?.name || 'Unknown Listing'}</p>
+                  <p className="text-sm text-foreground-muted capitalize">{booking.listing?.type || 'N/A'}</p>
                 </div>
                 <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full">
-                  ₹{booking.listing.price.toLocaleString('en-IN')} / month
+                  ₹{(booking.listing?.price || 0).toLocaleString('en-IN')} / month
                 </span>
               </div>
-              {booking.listing.address && (
+              {(booking.listing as any)?.address && (
                 <p className="text-sm text-foreground-muted flex items-start gap-2">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  {booking.listing.address}
+                  {(booking.listing as any)?.address}
                 </p>
               )}
             </div>

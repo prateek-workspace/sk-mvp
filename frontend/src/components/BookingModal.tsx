@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, QrCode, Camera, Upload, Hash, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../utils/api';
+import { BookingsService } from '../services/bookings.service';
 
 interface Listing {
   id: number;
@@ -44,7 +44,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
   const fetchPaymentInfo = async () => {
     try {
       setLoadingQR(true);
-      const data = await api.get('/bookings/payment-info');
+      const data = await BookingsService.getPaymentInfo();
       setPaymentQR(data.payment_qr_code);
       setPaymentUPI(data.payment_upi_id);
     } catch (error: any) {
@@ -171,11 +171,11 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
       }
 
       // Create booking with payment proof
-      await api.post('/bookings/', {
+      await BookingsService.createBooking({
         listing_id: listing.id,
         quantity: quantity,
-        payment_id: transactionId.trim() || null,
-        payment_screenshot: screenshotUrl,
+        payment_id: transactionId.trim() || undefined,
+        payment_screenshot: screenshotUrl || undefined,
       });
 
       toast.dismiss();
