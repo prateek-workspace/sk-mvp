@@ -1,6 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, field_validator
+from enum import Enum
+
+
+class PaymentStatus(str, Enum):
+    """Payment verification status"""
+    pending = "pending"
+    verified = "verified"
+    fake = "fake"
 
 
 class BookingBase(BaseModel):
@@ -65,6 +73,7 @@ class BookingOut(BaseModel):
     payment_id: Optional[str] = None
     payment_screenshot: Optional[str] = None
     payment_verified: bool = False
+    payment_status: PaymentStatus = PaymentStatus.pending
     payment_verified_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -83,6 +92,7 @@ class BookingWithDetails(BaseModel):
     payment_id: Optional[str] = None
     payment_screenshot: Optional[str] = None
     payment_verified: bool = False
+    payment_status: str = "pending"
     payment_verified_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -108,7 +118,7 @@ class BookingCreateResponse(BaseModel):
 
 # Admin payment verification
 class PaymentVerificationUpdate(BaseModel):
-    payment_verified: bool
+    payment_status: PaymentStatus
     notes: Optional[str] = None
 
 

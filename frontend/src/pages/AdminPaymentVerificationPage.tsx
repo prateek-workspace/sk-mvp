@@ -43,24 +43,31 @@ const AdminPaymentVerificationPage: React.FC = () => {
     }
   };
 
-  const handleVerifyPayment = async (verified: boolean) => {
+  const handleVerifyPayment = async (paymentStatus: 'verified' | 'fake' | 'pending') => {
     if (!selectedBooking) return;
 
     try {
       setProcessing(true);
       await BookingsService.verifyPayment(
         selectedBooking.id,
-        verified,
+        paymentStatus,
         verificationNotes || undefined
       );
-      toast.success(`Payment ${verified ? 'verified' : 'rejected'} successfully`);
+      
+      const statusMessages = {
+        verified: 'Payment verified successfully',
+        fake: 'Payment marked as fake and booking cancelled',
+        pending: 'Payment marked as pending'
+      };
+      
+      toast.success(statusMessages[paymentStatus]);
       loadBookings();
       setShowModal(false);
       setSelectedBooking(null);
       setVerificationNotes('');
     } catch (error: any) {
       console.error('Failed to verify payment:', error);
-      toast.error('Failed to verify payment');
+      toast.error('Failed to update payment status');
     } finally {
       setProcessing(false);
     }
@@ -152,13 +159,21 @@ const AdminPaymentVerificationPage: React.FC = () => {
                     <h3 className="font-semibold text-lg text-foreground-default">
                       Booking #{booking.id}
                     </h3>
+                    {/* Payment Status Badge */}
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      booking.payment_verified 
+                      booking.payment_status === 'verified'
                         ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
+                        : booking.payment_status === 'fake'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
                         : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-400'
                     }`}>
-                      {booking.payment_verified ? '✓ Payment Verified' : '⏳ Pending Verification'}
+                      {booking.payment_status === 'verified' 
+                        ? '✓ Payment Verified' 
+                        : booking.payment_status === 'fake'
+                        ? '✗ Fake Payment'
+                        : '⏳ Pending Verification'}
                     </span>
+                    {/* Booking Status Badge */}
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       booking.status === 'accepted' 
                         ? 'bg-green-100 text-green-700'
@@ -166,6 +181,8 @@ const AdminPaymentVerificationPage: React.FC = () => {
                         ? 'bg-red-100 text-red-700'
                         : booking.status === 'waitlist'
                         ? 'bg-orange-100 text-orange-700'
+                        : booking.status === 'cancelled'
+                        ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-400'
                         : 'bg-gray-100 text-gray-700'
                     }`}>
                       {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
@@ -197,7 +214,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-foreground-muted">Quantity:</span>{' '}
-                      <span className="text-foreground-default">{booking.quantity} months</span>
+                      <span className="text-foreground-default">{booking.quantity} seats</span>
                     </div>
                     <div>
                       <span className="text-foreground-muted">Date:</span>{' '}
@@ -297,7 +314,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-foreground-muted">Quantity</p>
-                      <p className="text-foreground-default">{selectedBooking.quantity} months</p>
+                      <p className="text-foreground-default">{selectedBooking.quantity} seats</p>
                     </div>
                     {selectedBooking.payment_id && (
                       <div className="col-span-2">
@@ -338,30 +355,42 @@ const AdminPaymentVerificationPage: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowModal(false)}
-                  disabled={processing}
-                  className="px-6 py-3 bg-surface text-foreground-default rounded-lg font-medium hover:bg-border transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleVerifyPayment(false)}
-                  disabled={processing}
-                  className="flex-1 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <XCircle className="w-5 h-5" />}
-                  Reject Payment
-                </button>
-                <button
-                  onClick={() => handleVerifyPayment(true)}
-                  disabled={processing}
-                  className="flex-1 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
-                  Verify Payment
-                </button>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    disabled={processing}
+                    className="px-6 py-3 bg-surface text-foreground-default rounded-lg font-medium hover:bg-border transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleVerifyPayment('pending')}
+                    disabled={processing}
+                    className="flex-1 py-3 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <AlertCircle className="w-5 h-5" />}
+                    Keep Pending
+                  </button>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleVerifyPayment('fake')}
+                    disabled={processing}
+                    className="flex-1 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <XCircle className="w-5 h-5" />}
+                    Mark as Fake
+                  </button>
+                  <button
+                    onClick={() => handleVerifyPayment('verified')}
+                    disabled={processing}
+                    className="flex-1 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                    Verify Payment
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>

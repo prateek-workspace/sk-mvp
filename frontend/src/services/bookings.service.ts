@@ -54,9 +54,9 @@ export class BookingsService {
     return api.patch(`/bookings/${bookingId}/status`, data);
   }
 
-  static async verifyPayment(bookingId: number, verified: boolean, notes?: string): Promise<Booking> {
+  static async verifyPayment(bookingId: number, paymentStatus: 'verified' | 'fake' | 'pending', notes?: string): Promise<Booking> {
     return api.patch(`/bookings/${bookingId}/verify-payment`, {
-      payment_verified: verified,
+      payment_status: paymentStatus,
       notes,
     });
   }

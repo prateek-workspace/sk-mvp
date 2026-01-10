@@ -202,7 +202,7 @@ def verify_payment(
     current_user: User = Depends(AccountService.current_user),
     service: BookingService = Depends(get_booking_service),
 ):
-    """Admin verifies payment for a booking"""
+    """Admin verifies payment for a booking. Can mark as verified, fake, or pending."""
     if current_user.role != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
     
@@ -210,7 +210,7 @@ def verify_payment(
     if not booking:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
     
-    return service.verify_payment(booking_id, data.payment_verified)
+    return service.verify_payment(booking_id, data.payment_status.value)
 
 
 @router.post("/admin/upload-qr")

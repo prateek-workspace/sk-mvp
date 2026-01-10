@@ -59,12 +59,13 @@ export interface Booking {
   id: number;
   listing_id: number;
   user_id: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'waitlist';
+  status: 'pending' | 'accepted' | 'rejected' | 'waitlist' | 'cancelled';
   amount: number;
   quantity: number;
   payment_id?: string;
   payment_screenshot?: string;
   payment_verified: boolean;
+  payment_status?: 'pending' | 'verified' | 'fake';
   payment_verified_at?: string;
   created_at: string;
   updated_at?: string;

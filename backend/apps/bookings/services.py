@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from datetime import datetime
 
-from apps.bookings.models import Booking
+from apps.bookings.models import Booking, PaymentStatus
 from apps.bookings.schemas import BookingCreate, BookingUpdate, AdminSettingsUpdate
 from apps.core.models import AdminSettings
 from apps.accounts.models import User
@@ -52,6 +52,7 @@ class BookingService:
                 "payment_id": booking.payment_id,
                 "payment_screenshot": booking.payment_screenshot,
                 "payment_verified": booking.payment_verified,
+                "payment_status": booking.payment_status.value if booking.payment_status else "pending",
                 "payment_verified_at": booking.payment_verified_at.isoformat() if booking.payment_verified_at else None,
                 "created_at": booking.created_at.isoformat() if booking.created_at else None,
                 "updated_at": booking.updated_at.isoformat() if booking.updated_at else None,
@@ -139,16 +140,26 @@ class BookingService:
         self.db.refresh(booking)
         return booking
 
-    def verify_payment(self, booking_id: int, payment_verified: bool) -> Optional[Booking]:
-        """Admin verifies payment for a booking"""
+    def verify_payment(self, booking_id: int, payment_status: str) -> Optional[Booking]:
+        """Admin verifies payment for a booking. If marked as fake, cancels the booking."""
         booking = self.get_booking(booking_id)
         if not booking:
             return None
         
-        booking.payment_verified = payment_verified
-        if payment_verified:
+        # Update payment_status enum
+        booking.payment_status = PaymentStatus(payment_status)
+        
+        # Update legacy payment_verified field for backward compatibility
+        booking.payment_verified = (payment_status == PaymentStatus.verified.value)
+        
+        if payment_status == PaymentStatus.verified.value:
             booking.payment_verified_at = datetime.utcnow()
+        elif payment_status == PaymentStatus.fake.value:
+            # Cancel the booking if payment is fake
+            booking.status = "cancelled"
+            booking.payment_verified_at = None
         else:
+            # Pending - reset verification timestamp
             booking.payment_verified_at = None
         
         self.db.commit()

@@ -63,10 +63,17 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setCameraActive(true);
+        toast.success('Camera activated successfully');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error accessing camera:', error);
-      toast.error('Could not access camera. Please upload a file instead.');
+      if (error.name === 'NotAllowedError') {
+        toast.error('Camera permission denied. Please allow camera access and try again, or upload a file instead.');
+      } else if (error.name === 'NotFoundError') {
+        toast.error('No camera found on this device. Please upload a file instead.');
+      } else {
+        toast.error('Could not access camera. Please upload a file instead.');
+      }
     }
   };
 
@@ -257,7 +264,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                 {/* Quantity Selector */}
                 <div>
                   <label className="block text-sm font-medium text-foreground-default mb-3">
-                    Select Quantity (1-5)
+                    Select Seats (1-5)
                   </label>
                   <div className="flex items-center gap-4">
                     <button
@@ -269,7 +276,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                     <div className="flex-1 text-center">
                       <div className="text-4xl font-bold text-primary">{quantity}</div>
                       <div className="text-sm text-foreground-muted mt-1">
-                        {quantity === 1 ? 'month' : 'months'}
+                        {quantity === 1 ? 'seat' : 'seats'}
                       </div>
                     </div>
                     <button
@@ -290,7 +297,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                     </span>
                   </div>
                   <p className="text-xs text-foreground-muted mt-1">
-                    ₹{listing.price.toLocaleString('en-IN')} × {quantity} {quantity === 1 ? 'month' : 'months'}
+                    ₹{listing.price.toLocaleString('en-IN')} × {quantity} {quantity === 1 ? 'seat' : 'seats'}
                   </p>
                 </div>
 
