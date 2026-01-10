@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "lint:dualite": "eslint --config eslint.dualite.config.js .",
-    "tsc:dualite": "yarn tsc -p tsconfig.dualite.json",
+    "tsc:dualite": "tsc -p tsconfig.dualite.json",
     "preview": "vite preview"
   },
   "dependencies": {
