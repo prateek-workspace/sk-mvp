@@ -18,7 +18,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://skstudentpath.netlify.app",
+        "https://sk-mvp.pages.dev",
         "https://skstudentpath.com",
         "https://www.skstudentpath.com",
         "http://localhost:5173",          # Vite dev server
