@@ -122,28 +122,28 @@ const AdminPaymentSettingsPage: React.FC = () => {
 
   return (
     <DashboardLayout role={currentUser?.role || 'admin'} pageTitle="Payment Settings">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground-default">Payment Settings</h1>
-            <p className="text-foreground-muted mt-1">
+        <div className="flex items-start sm:items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground-default">Payment Settings</h1>
+            <p className="text-sm sm:text-base text-foreground-muted mt-1">
               Configure payment QR code and UPI ID for student bookings
             </p>
           </div>
-          <QrCode className="w-12 h-12 text-primary" />
+          <QrCode className="w-10 h-10 sm:w-12 sm:h-12 text-primary flex-shrink-0" />
         </div>
 
         {loading ? (
-          <div className="bg-background border border-border rounded-lg p-8 text-center">
+          <div className="bg-background border border-border rounded-lg p-6 sm:p-8 text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
             <p className="text-foreground-muted mt-4">Loading settings...</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* QR Code Upload Section */}
-            <div className="bg-background border border-border rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-foreground-default mb-4 flex items-center gap-2">
+            <div className="bg-background border border-border rounded-lg p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground-default mb-4 flex items-center gap-2">
                 <QrCode className="w-5 h-5" />
                 Payment QR Code
               </h2>
@@ -151,15 +151,15 @@ const AdminPaymentSettingsPage: React.FC = () => {
               <div className="space-y-4">
                 {settings.payment_qr_code ? (
                   <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                      <div className="flex-shrink-0 w-full sm:w-auto flex justify-center">
                         <img
                           src={settings.payment_qr_code}
                           alt="Payment QR Code"
-                          className="w-64 h-64 object-contain border-2 border-border rounded-lg bg-surface"
+                          className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain border-2 border-border rounded-lg bg-surface"
                         />
                       </div>
-                      <div className="flex-1 space-y-3">
+                      <div className="flex-1 space-y-3 w-full">
                         <div className="flex items-center gap-2 text-green-600">
                           <Check className="w-5 h-5" />
                           <span className="font-medium">QR Code Active</span>
@@ -168,8 +168,8 @@ const AdminPaymentSettingsPage: React.FC = () => {
                           This QR code will be displayed to students when they make bookings.
                           They can scan this QR code to make payments.
                         </p>
-                        <div className="flex gap-3">
-                          <label className="cursor-pointer">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <label className="cursor-pointer flex-1 sm:flex-none">
                             <input
                               type="file"
                               accept="image/*"
@@ -177,7 +177,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                               disabled={uploading}
                               className="hidden"
                             />
-                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30">
+                            <span className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30 w-full sm:w-auto text-sm sm:text-base">
                               {uploading ? (
                                 <>
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -193,7 +193,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                           </label>
                           <button
                             onClick={handleRemoveQR}
-                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors w-full sm:w-auto text-sm sm:text-base"
                           >
                             Remove QR
                           </button>
@@ -202,12 +202,12 @@ const AdminPaymentSettingsPage: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                    <QrCode className="w-16 h-16 text-foreground-muted mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-foreground-default mb-2">
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-8 text-center">
+                    <QrCode className="w-12 h-12 sm:w-16 sm:h-16 text-foreground-muted mx-auto mb-4" />
+                    <h3 className="text-base sm:text-lg font-medium text-foreground-default mb-2">
                       No QR Code Uploaded
                     </h3>
-                    <p className="text-sm text-foreground-muted mb-6">
+                    <p className="text-xs sm:text-sm text-foreground-muted mb-6">
                       Upload a QR code image that students will use for payments
                     </p>
                     <label className="cursor-pointer inline-block">
@@ -218,15 +218,15 @@ const AdminPaymentSettingsPage: React.FC = () => {
                         disabled={uploading}
                         className="hidden"
                       />
-                      <span className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30">
+                      <span className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/30 text-sm sm:text-base">
                         {uploading ? (
                           <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <Loader2 className="w-4 sm:w-5 h-4 sm:h-5 animate-spin" />
                             Uploading...
                           </>
                         ) : (
                           <>
-                            <Upload className="w-5 h-5" />
+                            <Upload className="w-4 sm:w-5 h-4 sm:h-5" />
                             Upload QR Code
                           </>
                         )}
@@ -241,8 +241,8 @@ const AdminPaymentSettingsPage: React.FC = () => {
             </div>
 
             {/* UPI ID Section */}
-            <div className="bg-background border border-border rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-foreground-default mb-4">
+            <div className="bg-background border border-border rounded-lg p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground-default mb-4">
                 UPI ID (Optional)
               </h2>
 
@@ -256,7 +256,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
                     value={upiId}
                     onChange={(e) => setUpiId(e.target.value)}
                     placeholder="example@upi"
-                    className="w-full px-4 py-2 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 sm:px-4 py-2 bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
                   />
                   <p className="text-xs text-foreground-muted mt-1">
                     Provide a UPI ID as an alternative payment method
@@ -265,15 +265,15 @@ const AdminPaymentSettingsPage: React.FC = () => {
 
                 <button
                   onClick={handleUpiUpdate}
-                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors shadow-lg shadow-primary/30 text-sm sm:text-base"
                 >
                   Save UPI ID
                 </button>
 
                 {settings.payment_upi_id && (
                   <div className="flex items-center gap-2 text-green-600 text-sm">
-                    <Check className="w-4 h-4" />
-                    <span>Current UPI ID: {settings.payment_upi_id}</span>
+                    <Check className="w-4 h-4 flex-shrink-0" />
+                    <span className="break-all">Current UPI ID: {settings.payment_upi_id}</span>
                   </div>
                 )}
               </div>
@@ -282,7 +282,7 @@ const AdminPaymentSettingsPage: React.FC = () => {
             {/* Info Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-900">
+              <div className="text-xs sm:text-sm text-blue-900">
                 <p className="font-medium mb-1">Important Information</p>
                 <ul className="list-disc list-inside space-y-1 text-blue-800">
                   <li>Students will see this QR code when making bookings</li>

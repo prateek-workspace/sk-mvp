@@ -32,20 +32,20 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3 }}
-            className="bg-background rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col"
+            className="bg-background rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col mx-4"
           >
-            <div className="p-4 border-b border-border flex justify-between items-center flex-shrink-0">
-              <h2 className="text-xl font-semibold">{listing.name}</h2>
+            <div className="p-4 sm:p-6 border-b border-border flex justify-between items-center flex-shrink-0">
+              <h2 className="text-lg sm:text-xl font-semibold truncate pr-4">{listing.name}</h2>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-surface transition-colors"
+                className="p-2 rounded-full hover:bg-surface transition-colors flex-shrink-0"
               >
                 <X className="w-5 h-5 text-foreground-muted" />
               </button>
             </div>
 
             <div className="overflow-y-auto flex-grow">
-              <div className="h-72 w-full">
+              <div className="h-48 sm:h-64 md:h-72 w-full">
                 <img 
                   src={listing.image_url || 'https://placehold.co/800x400/E5E7EB/6B7280?text=No+Image'} 
                   alt={listing.name} 
@@ -53,7 +53,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                 />
               </div>
               
-              <div className="p-8 grid md:grid-cols-3 gap-8">
+              <div className="p-4 sm:p-6 md:p-8 grid md:grid-cols-3 gap-6 md:gap-8">
                 <div className="md:col-span-2">
                   <div className="flex items-center space-x-4 mb-4 text-foreground-muted">
                     <div className="flex items-center">
@@ -64,12 +64,12 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                   </div>
                   <p className="text-foreground-muted mb-8">{listing.description}</p>
 
-                  <div className="mb-8">
-                    <h4 className="font-semibold text-lg text-foreground-default mb-4 pb-2 border-b border-border">Features</h4>
-                    <ul className="grid grid-cols-2 gap-3">
+                  <div className="mb-6 sm:mb-8">
+                    <h4 className="font-semibold text-base sm:text-lg text-foreground-default mb-4 pb-2 border-b border-border">Features</h4>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {(listing.features || []).map((feature, i) => (
                         <li key={i} className="flex items-center text-sm text-foreground-default">
-                          <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                          <CheckCircle className="w-4 h-4 mr-2 text-green-500 flex-shrink-0" />
                           {feature}
                         </li>
                       ))}

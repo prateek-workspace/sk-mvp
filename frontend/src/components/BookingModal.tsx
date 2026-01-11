@@ -237,25 +237,25 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="bg-background rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-background rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-background border-b border-border px-6 py-4 flex items-center justify-between z-10">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground-default">Book Now</h2>
-            <p className="text-sm text-foreground-muted">{listing.name}</p>
+        <div className="sticky top-0 bg-background border-b border-border px-4 sm:px-6 py-4 flex items-center justify-between z-10">
+          <div className="flex-1 min-w-0 pr-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground-default">Book Now</h2>
+            <p className="text-sm text-foreground-muted truncate">{listing.name}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-surface rounded-lg transition-colors"
+            className="p-2 hover:bg-surface rounded-lg transition-colors flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Listing Info */}
           <div className="bg-surface rounded-lg p-4">
             <h3 className="font-semibold text-foreground-default mb-2">{listing.name}</h3>
@@ -361,20 +361,20 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                     <p className="text-sm text-foreground-muted mt-2">Loading payment information...</p>
                   </div>
                 ) : paymentQR ? (
-                  <div className="bg-surface rounded-lg p-6 text-center">
-                    <h3 className="font-semibold text-foreground-default mb-4 flex items-center justify-center gap-2">
+                  <div className="bg-surface rounded-lg p-4 sm:p-6 text-center">
+                    <h3 className="font-semibold text-foreground-default mb-4 flex items-center justify-center gap-2 text-sm sm:text-base">
                       <QrCode className="w-5 h-5" />
                       Scan QR Code to Pay
                     </h3>
                     <img 
                       src={paymentQR} 
                       alt="Payment QR Code" 
-                      className="w-64 h-64 mx-auto object-contain border-2 border-border rounded-lg bg-surface"
+                      className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto object-contain border-2 border-border rounded-lg bg-surface"
                     />
                     {paymentUPI && (
                       <div className="mt-4">
-                        <p className="text-sm text-foreground-muted">Or pay to UPI ID:</p>
-                        <p className="font-mono font-semibold text-primary">{paymentUPI}</p>
+                        <p className="text-xs sm:text-sm text-foreground-muted">Or pay to UPI ID:</p>
+                        <p className="font-mono font-semibold text-primary text-sm sm:text-base break-all">{paymentUPI}</p>
                       </div>
                     )}
                   </div>
@@ -392,13 +392,13 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                   <label className="block text-sm font-medium text-foreground-default mb-3">
                     Submit Payment Proof
                   </label>
-                  <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <button
                       onClick={() => {
                         setPaymentMethod('screenshot');
                         // Don't auto-start camera, user will click to open modal
                       }}
-                      className={`py-3 px-4 rounded-lg border-2 font-medium transition-colors ${
+                      className={`py-3 px-4 rounded-lg border-2 font-medium transition-colors text-sm ${
                         paymentMethod === 'screenshot'
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-border bg-surface text-foreground-muted hover:border-primary/50'
@@ -412,7 +412,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                         setPaymentMethod('transaction_id');
                         stopCamera();
                       }}
-                      className={`py-3 px-4 rounded-lg border-2 font-medium transition-colors ${
+                      className={`py-3 px-4 rounded-lg border-2 font-medium transition-colors text-sm ${
                         paymentMethod === 'transaction_id'
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-border bg-surface text-foreground-muted hover:border-primary/50'
@@ -578,19 +578,19 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-background rounded-2xl max-w-2xl w-full shadow-2xl"
+            className="bg-background rounded-2xl max-w-2xl w-full shadow-2xl mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-foreground-default">Capture Payment Proof</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground-default">Capture Payment Proof</h3>
                 <button
                   onClick={() => {
                     setShowCameraModal(false);
                     stopCamera();
                   }}
-                  className="p-2 hover:bg-surface rounded-lg transition-colors"
+                  className="p-2 hover:bg-surface rounded-lg transition-colors flex-shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>
