@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Eye, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, Clock, ChevronLeft, ChevronRight, UserCheck, Ban } from 'lucide-react';
 import { Booking } from '../../types';
 import { toast } from 'react-hot-toast';
 import { BookingsService } from '../../services/bookings.service';
@@ -14,8 +14,15 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showProof, setShowProof] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-  const handleUpdateStatus = async (bookingId: number, status: 'accepted' | 'rejected') => {
+  // Pagination
+  const totalPages = Math.ceil(bookings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedBookings = bookings.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleUpdateStatus = async (bookingId: number, status: 'accepted' | 'rejected' | 'waitlist') => {
     try {
       setProcessing(true);
       await BookingsService.updateBookingStatus(bookingId, status);
@@ -39,8 +46,14 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
     switch (status) {
       case 'accepted': return 'text-green-600 bg-green-100 dark:bg-green-900/50';
       case 'rejected': return 'text-red-600 bg-red-100 dark:bg-red-900/50';
+      case 'waitlist': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/50';
+      case 'cancelled': return 'text-gray-600 bg-gray-100 dark:bg-gray-900/50';
       default: return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/50';
     }
+  };
+
+  const canManageBooking = (status: string) => {
+    return status === 'pending' || status === 'waitlist';
   };
 
   return (
@@ -51,7 +64,8 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
         {bookings.length === 0 ? (
           <p className="text-foreground-muted text-center py-8">No booking requests yet</p>
         ) : (
-          bookings.map((booking) => (
+          <>
+            {paginatedBookings.map((booking) => (
             <motion.div
               key={booking.id}
               initial={{ opacity: 0, y: 10 }}
@@ -77,16 +91,14 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                 </div>
 
                 <div className="flex flex-col space-y-2">
-                  {booking.payment_screenshot && booking.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => viewPaymentProof(booking)}
-                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center space-x-2 text-sm shadow-lg shadow-primary/30"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span>View Proof</span>
-                      </button>
-                    </>
+                  {canManageBooking(booking.status) && booking.payment_screenshot && (
+                    <button
+                      onClick={() => viewPaymentProof(booking)}
+                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center space-x-2 text-sm shadow-lg shadow-primary/30"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>View & Manage</span>
+                    </button>
                   )}
                   {!booking.payment_screenshot && booking.status === 'pending' && (
                     <div className="flex items-center space-x-2 text-xs text-yellow-600">
@@ -97,7 +109,36 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                 </div>
               </div>
             </motion.div>
-          ))
+          ))}
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+              <p className="text-sm text-foreground-muted">
+                Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, bookings.length)} of {bookings.length}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-surface border border-border rounded-lg hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="px-3 py-1 bg-surface border border-border rounded-lg text-sm font-medium">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-surface border border-border rounded-lg hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
 
@@ -136,23 +177,56 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                 </div>
               </div>
 
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => handleUpdateStatus(selectedBooking.id, 'accepted')}
-                  disabled={processing}
-                  className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
-                >
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Accept Booking
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus(selectedBooking.id, 'rejected')}
-                  disabled={processing}
-                  className="flex-1 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center"
-                >
-                  <XCircle className="w-5 h-5 mr-2" />
-                  Reject Booking
-                </button>
+              <div className="flex flex-col gap-3">
+                {selectedBooking.status === 'waitlist' ? (
+                  // Waitlist actions
+                  <>
+                    <button
+                      onClick={() => handleUpdateStatus(selectedBooking.id, 'accepted')}
+                      disabled={processing}
+                      className="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                    >
+                      <UserCheck className="w-5 h-5 mr-2" />
+                      Admit from Waitlist
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(selectedBooking.id, 'rejected')}
+                      disabled={processing}
+                      className="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                    >
+                      <Ban className="w-5 h-5 mr-2" />
+                      Cancel Booking
+                    </button>
+                  </>
+                ) : (
+                  // Pending actions
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleUpdateStatus(selectedBooking.id, 'accepted')}
+                      disabled={processing}
+                      className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                    >
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                      Accept Booking
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(selectedBooking.id, 'waitlist')}
+                      disabled={processing}
+                      className="flex-1 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                    >
+                      <Clock className="w-5 h-5 mr-2" />
+                      Waitlist
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(selectedBooking.id, 'rejected')}
+                      disabled={processing}
+                      className="flex-1 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                    >
+                      <XCircle className="w-5 h-5 mr-2" />
+                      Reject
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

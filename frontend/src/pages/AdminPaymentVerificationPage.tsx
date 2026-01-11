@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, AlertCircle, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import { BookingsService } from '../services/bookings.service';
@@ -18,6 +18,8 @@ const AdminPaymentVerificationPage: React.FC = () => {
   const [verificationNotes, setVerificationNotes] = useState('');
   const [processing, setProcessing] = useState(false);
   const [filter, setFilter] = useState<'unverified' | 'verified' | 'all'>('unverified');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (authLoading) return;
@@ -87,6 +89,16 @@ const AdminPaymentVerificationPage: React.FC = () => {
     return true;
   });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedBookings = filteredBookings.slice(startIndex, startIndex + itemsPerPage);
+
+  // Reset to page 1 when filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
+
   if (authLoading) {
     return (
       <DashboardLayout role="admin" pageTitle="Payment Verification">
@@ -147,7 +159,8 @@ const AdminPaymentVerificationPage: React.FC = () => {
             <p className="text-foreground-muted">No bookings to display</p>
           </div>
         ) : (
-          filteredBookings.map((booking, idx) => (
+          <>
+            {paginatedBookings.map((booking, idx) => (
             <motion.div
               key={booking.id}
               initial={{ opacity: 0, y: 10 }}
@@ -274,7 +287,38 @@ const AdminPaymentVerificationPage: React.FC = () => {
                 </div>
               </div>
             </motion.div>
-          ))
+          ))}
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-between bg-surface border border-border rounded-xl p-4">
+              <p className="text-sm text-foreground-muted">
+                Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredBookings.length)} of {filteredBookings.length} bookings
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-background border border-border rounded-lg hover:bg-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+                <span className="px-4 py-2 bg-background border border-border rounded-lg text-sm font-medium">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-background border border-border rounded-lg hover:bg-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </div>
 
