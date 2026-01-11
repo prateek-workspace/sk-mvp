@@ -213,6 +213,20 @@ def verify_payment(
     return service.verify_payment(booking_id, data.payment_status.value)
 
 
+@router.post("/upload-payment-screenshot")
+async def upload_payment_screenshot(
+    file: UploadFile = File(...),
+    current_user: User = Depends(AccountService.current_user),
+):
+    """Upload payment screenshot to Cloudinary"""
+    try:
+        # Upload to Cloudinary
+        result = await CloudinaryService.upload_image(file, folder="prephub/payment_screenshots")
+        return {"url": result['url']}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
 @router.post("/admin/upload-qr")
 async def upload_qr_code(
     file: UploadFile = File(...),

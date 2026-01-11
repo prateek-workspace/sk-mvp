@@ -162,30 +162,30 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
   };
 
   const uploadToCloudinary = async (base64Image: string): Promise<string> => {
-    const formData = new FormData();
-    
     // Convert base64 to blob
     const response = await fetch(base64Image);
     const blob = await response.blob();
     
-    formData.append('file', blob);
-    formData.append('upload_preset', 'unsigned_preset'); // Replace with your preset
-    formData.append('folder', 'payment_screenshots');
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', blob, 'payment-screenshot.jpg');
 
-    const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: 'POST',
-        body: formData,
-      }
-    );
+    // Upload via backend endpoint
+    const uploadResponse = await fetch(`${import.meta.env.VITE_API_URL}/bookings/upload-payment-screenshot`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: formData,
+    });
 
-    if (!cloudinaryResponse.ok) {
-      throw new Error('Failed to upload to Cloudinary');
+    if (!uploadResponse.ok) {
+      const error = await uploadResponse.json();
+      throw new Error(error.detail || 'Failed to upload to Cloudinary');
     }
 
-    const data = await cloudinaryResponse.json();
-    return data.secure_url;
+    const data = await uploadResponse.json();
+    return data.url;
   };
 
   const handleSubmit = async () => {
