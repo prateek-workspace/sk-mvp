@@ -25,7 +25,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
   const handleUpdateStatus = async (bookingId: number, status: 'accepted' | 'rejected' | 'waitlist') => {
     try {
       setProcessing(true);
-      await BookingsService.updateBookingStatus(bookingId, status);
+      await BookingsService.updateBookingStatus(bookingId, { status });
       toast.success(`Booking ${status}!`);
       onUpdate();
       setShowProof(false);
@@ -81,8 +81,11 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                     </span>
                   </div>
                   <div className="text-sm space-y-1">
-                    <p className="text-foreground-muted">User ID: <span className="text-foreground-default">{booking.user_id}</span></p>
-                    <p className="text-foreground-muted">Amount: <span className="text-foreground-default font-medium">₹{booking.amount.toLocaleString('en-IN')}</span></p>
+                    <p className="text-foreground-muted">Student: <span className="text-foreground-default font-medium">{booking.user?.first_name && booking.user?.last_name ? `${booking.user.first_name} ${booking.user.last_name}` : booking.user?.email || 'Unknown'}</span></p>
+                    {booking.listing && (
+                      <p className="text-foreground-muted">Listing: <span className="text-foreground-default">{booking.listing.name}</span></p>
+                    )}
+                    <p className="text-foreground-muted">Seats: <span className="text-foreground-default font-medium">{booking.quantity}</span> × ₹{booking.listing ? (booking.amount / booking.quantity).toLocaleString('en-IN') : booking.amount.toLocaleString('en-IN')}/seat = <span className="font-semibold">₹{booking.amount.toLocaleString('en-IN')}</span></p>
                     <p className="text-foreground-muted">Date: <span className="text-foreground-default">{new Date(booking.created_at).toLocaleDateString('en-IN')}</span></p>
                     {booking.payment_id && (
                       <p className="text-foreground-muted">Payment ID: <span className="text-foreground-default font-mono text-xs">{booking.payment_id}</span></p>
@@ -162,6 +165,11 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                   <p className="text-sm text-foreground-muted mb-2">Booking Details</p>
                   <div className="space-y-1">
                     <p className="text-foreground-default">Booking ID: <strong>#{selectedBooking.id}</strong></p>
+                    <p className="text-foreground-default">Student: <strong>{selectedBooking.user?.first_name && selectedBooking.user?.last_name ? `${selectedBooking.user.first_name} ${selectedBooking.user.last_name}` : selectedBooking.user?.email || 'Unknown'}</strong></p>
+                    {selectedBooking.listing && (
+                      <p className="text-foreground-default">Listing: <strong>{selectedBooking.listing.name}</strong></p>
+                    )}
+                    <p className="text-foreground-default">Seats: <strong>{selectedBooking.quantity}</strong></p>
                     <p className="text-foreground-default">Amount: <strong>₹{selectedBooking.amount.toLocaleString('en-IN')}</strong></p>
                     <p className="text-foreground-default">Payment ID: <strong className="font-mono text-sm">{selectedBooking.payment_id}</strong></p>
                   </div>

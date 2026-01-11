@@ -63,6 +63,16 @@ class UserBasic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ListingBasic(BaseModel):
+    id: int
+    name: str
+    type: str
+    price: float
+    location: Optional[str] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
 class BookingOut(BaseModel):
     id: int
     listing_id: int
@@ -78,6 +88,7 @@ class BookingOut(BaseModel):
     created_at: datetime
     updated_at: Optional[datetime] = None
     user: Optional[UserBasic] = None
+    listing: Optional[ListingBasic] = None
     
     model_config = ConfigDict(from_attributes=True)
 

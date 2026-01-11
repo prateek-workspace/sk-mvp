@@ -14,8 +14,11 @@ class BookingService:
         self.db = db
 
     def list_bookings(self, user_id: Optional[int] = None, listing_id: Optional[int] = None) -> List[Booking]:
-        """List all bookings with user details, optionally filtered by user or listing"""
-        query = select(Booking).options(joinedload(Booking.user))
+        """List all bookings with user and listing details, optionally filtered by user or listing"""
+        query = select(Booking).options(
+            joinedload(Booking.user),
+            joinedload(Booking.listing)
+        )
         
         if user_id:
             query = query.where(Booking.user_id == user_id)
@@ -61,8 +64,14 @@ class BookingService:
         return detailed_bookings
 
     def get_booking(self, booking_id: int) -> Optional[Booking]:
-        """Get a single booking by ID"""
-        return self.db.get(Booking, booking_id)
+        """Get a single booking by ID with user and listing details"""
+        query = select(Booking).options(
+            joinedload(Booking.user),
+            joinedload(Booking.listing)
+        ).where(Booking.id == booking_id)
+        
+        result = self.db.execute(query)
+        return result.scalars().first()
 
     def create_booking(self, data: BookingCreate, user_id: int, payment_id: Optional[str] = None, payment_screenshot: Optional[str] = None) -> Booking:
         """Create a new booking with quantity and payment proof"""
