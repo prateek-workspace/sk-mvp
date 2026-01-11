@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from enum import Enum
 
 
@@ -59,6 +59,24 @@ class UserBasic(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     phone_number: Optional[str] = None
+    name: Optional[str] = None
+    
+    @model_validator(mode='after')
+    def compute_name(self) -> 'UserBasic':
+        """Compute full name from first_name and last_name"""
+        if self.name is None:
+            first = (self.first_name or '').strip()
+            last = (self.last_name or '').strip()
+            
+            if first and last:
+                self.name = f"{first} {last}"
+            elif first:
+                self.name = first
+            elif last:
+                self.name = last
+            else:
+                self.name = self.email
+        return self
     
     model_config = ConfigDict(from_attributes=True)
 

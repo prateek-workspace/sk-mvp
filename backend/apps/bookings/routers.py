@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
 from sqlalchemy.orm import Session
+from typing import List
 
 from apps.bookings.schemas import (
     BookingCreate, BookingUpdate, BookingOut, BookingListOut,
@@ -159,7 +160,7 @@ async def list_bookings(
     return {"bookings": bookings, "total": len(bookings)}
 
 
-@router.get("/admin/all")
+@router.get("/admin/all", response_model=List[BookingOut])
 def list_all_bookings_admin(
     current_user: User = Depends(AccountService.current_user),
     service: BookingService = Depends(get_booking_service),
