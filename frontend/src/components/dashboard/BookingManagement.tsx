@@ -67,6 +67,25 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
     return !!(booking.payment_screenshot || booking.payment_id);
   };
 
+  const getUserName = (booking: Booking) => {
+    if (!booking.user) return 'No user data';
+    
+    const firstName = booking.user.first_name?.trim();
+    const lastName = booking.user.last_name?.trim();
+    
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    } else if (firstName) {
+      return firstName;
+    } else if (lastName) {
+      return lastName;
+    } else if (booking.user.email) {
+      return booking.user.email;
+    }
+    
+    return 'Unknown User';
+  };
+
   return (
     <div className="bg-background rounded-xl p-6 border border-border shadow-sm">
       <h3 className="text-lg font-semibold mb-6 text-foreground-default">Booking Requests</h3>
@@ -81,9 +100,9 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
               key={booking.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-4 bg-surface rounded-lg"
+              className="p-4 bg-surface rounded-lg border border-border"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <p className="font-semibold text-foreground-default">Booking #{booking.id}</p>
@@ -92,7 +111,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                     </span>
                   </div>
                   <div className="text-sm space-y-1">
-                    <p className="text-foreground-muted">Student: <span className="text-foreground-default font-medium">{booking.user?.first_name && booking.user?.last_name ? `${booking.user.first_name} ${booking.user.last_name}` : booking.user?.email || 'Unknown'}</span></p>
+                    <p className="text-foreground-muted">Student: <span className="text-foreground-default font-medium">{getUserName(booking)}</span></p>
                     {booking.listing && (
                       <p className="text-foreground-muted">Listing: <span className="text-foreground-default">{booking.listing.name}</span></p>
                     )}
@@ -104,7 +123,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                   </div>
                 </div>
 
-                <div className="flex flex-col space-y-2">
+                <div className="flex flex-col space-y-2 md:min-w-[200px]">
                   {/* Waitlist specific actions - shown inline */}
                   {booking.status === 'waitlist' && (
                     <div className="flex flex-col gap-2">
@@ -213,7 +232,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                   <p className="text-sm text-foreground-muted mb-2">Booking Details</p>
                   <div className="space-y-1">
                     <p className="text-foreground-default">Booking ID: <strong>#{selectedBooking.id}</strong></p>
-                    <p className="text-foreground-default">Student: <strong>{selectedBooking.user?.first_name && selectedBooking.user?.last_name ? `${selectedBooking.user.first_name} ${selectedBooking.user.last_name}` : selectedBooking.user?.email || 'Unknown'}</strong></p>
+                    <p className="text-foreground-default">Student: <strong>{getUserName(selectedBooking)}</strong></p>
                     {selectedBooking.listing && (
                       <p className="text-foreground-default">Listing: <strong>{selectedBooking.listing.name}</strong></p>
                     )}

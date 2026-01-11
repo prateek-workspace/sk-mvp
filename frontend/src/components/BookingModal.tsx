@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, QrCode, Camera, Upload, Hash, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,7 +19,7 @@ interface BookingModalProps {
   onSuccess: () => void;
 }
 
-const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess }) => {
+const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess }: BookingModalProps) => {
   const [step, setStep] = useState<'quantity' | 'payment'>('quantity');
   const [quantity, setQuantity] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'screenshot' | 'transaction_id'>('screenshot');

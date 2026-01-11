@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Star, CheckCircle } from 'lucide-react';
 import { Listing } from '../types';
@@ -9,7 +9,7 @@ interface ListingDetailsModalProps {
   onBook: (listing: Listing) => void;
 }
 
-const StarRating: React.FC<{ rating?: number }> = ({ rating }) => {
+const StarRating: React.FC<{ rating?: number }> = ({ rating }: { rating?: number }) => {
   if (!rating) return null;
   
   return (
@@ -20,7 +20,7 @@ const StarRating: React.FC<{ rating?: number }> = ({ rating }) => {
   );
 };
 
-const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onClose, onBook }) => {
+const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onClose, onBook }: ListingDetailsModalProps) => {
   if (!listing) return null;
 
   return (
@@ -67,7 +67,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                   <div className="mb-6 sm:mb-8">
                     <h4 className="font-semibold text-base sm:text-lg text-foreground-default mb-4 pb-2 border-b border-border">Features</h4>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {(listing.features || []).map((feature, i) => (
+                      {(listing.features || []).map((feature: string, i: number) => (
                         <li key={i} className="flex items-center text-sm text-foreground-default">
                           <CheckCircle className="w-4 h-4 mr-2 text-green-500 flex-shrink-0" />
                           {feature}
@@ -80,7 +80,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                     <div className="mb-8">
                       <h4 className="font-semibold text-lg text-foreground-default mb-6 pb-2 border-b border-border">Meet The Faculty</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {listing.faculty.map((teacher, i) => (
+                        {listing.faculty.map((teacher: any, i: number) => (
                           <div key={teacher.id || i} className="text-center flex flex-col items-center">
                             <img 
                               src={teacher.image_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(teacher.name) + '&background=random'} 
@@ -99,7 +99,7 @@ const ListingDetailsModal: React.FC<ListingDetailsModalProps> = ({ listing, onCl
                     <h4 className="font-semibold text-lg text-foreground-default mb-4 pb-2 border-b border-border">Reviews ({(listing.reviews || []).length})</h4>
                     {(listing.reviews || []).length > 0 ? (
                       <div className="space-y-6">
-                        {(listing.reviews || []).map(review => (
+                        {(listing.reviews || []).map((review: any) => (
                           <div key={review.id} className="flex items-start space-x-4">
                             <img src={review.avatar} alt={review.author} className="w-11 h-11 rounded-full" />
                             <div>

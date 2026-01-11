@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { Users, Eye, Shield, UserCheck } from 'lucide-react';
+import { Users, Eye, Shield, UserCheck, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
@@ -14,6 +15,7 @@ const AdminUsersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [updatingRole, setUpdatingRole] = useState<number | null>(null);
 
   useEffect(() => {
     if (currentUser?.role === 'admin') {
@@ -32,6 +34,26 @@ const AdminUsersPage: React.FC = () => {
       setUsers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRoleChange = async (userId: number, newRole: string) => {
+    if (userId === currentUser?.id) {
+      toast.error('You cannot change your own role');
+      return;
+    }
+    
+    try {
+      setUpdatingRole(userId);
+      await AdminService.updateUserRole(userId, newRole);
+      toast.success(`User role updated to ${newRole}`);
+      // Refresh the users list
+      await fetchUsers();
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      toast.error(error.message || 'Failed to update user role');
+    } finally {
+      setUpdatingRole(null);
     }
   };
 
@@ -182,11 +204,24 @@ const AdminUsersPage: React.FC = () => {
                         </h3>
                         <p className="text-xs text-foreground-muted mb-2">{user.email}</p>
                         <div className="flex flex-wrap gap-2 mb-2">
-                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            roleColors[user.role] || 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {user.role}
-                          </span>
+                          <div className="relative inline-block">
+                            <select
+                              value={user.role}
+                              onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                              disabled={updatingRole === user.id || user.id === currentUser?.id}
+                              className={`px-3 py-1 text-xs font-semibold rounded-full border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-7 ${
+                                roleColors[user.role] || 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              <option value="user">User</option>
+                              <option value="hostel">Hostel Owner</option>
+                              <option value="coaching">Coaching Owner</option>
+                              <option value="library">Library Owner</option>
+                              <option value="tiffin">Tiffin Owner</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                            <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -262,11 +297,24 @@ const AdminUsersPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            roleColors[user.role] || 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {user.role}
-                          </span>
+                          <div className="relative inline-block">
+                            <select
+                              value={user.role}
+                              onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                              disabled={updatingRole === user.id || user.id === currentUser?.id}
+                              className={`px-3 py-1 text-xs font-semibold rounded-full border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed appearance-none pr-8 ${
+                                roleColors[user.role] || 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              <option value="user">User</option>
+                              <option value="hostel">Hostel Owner</option>
+                              <option value="coaching">Coaching Owner</option>
+                              <option value="library">Library Owner</option>
+                              <option value="tiffin">Tiffin Owner</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                            <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col space-y-1">
