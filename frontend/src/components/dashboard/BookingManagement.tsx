@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, Eye, Clock, ChevronLeft, ChevronRight, UserCheck, Ban } from 'lucide-react';
+import { Eye, Clock, ChevronLeft, ChevronRight, UserCheck, Ban } from 'lucide-react';
 import { Booking } from '../../types';
 import { toast } from 'react-hot-toast';
 import { BookingsService } from '../../services/bookings.service';
@@ -11,7 +12,7 @@ interface BookingManagementProps {
   onUpdate: () => void;
 }
 
-const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdate }) => {
+const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdate }: BookingManagementProps) => {
   logger.lifecycle('BookingManagement', 'Component rendered', { bookingCount: bookings.length });
   
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -95,7 +96,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
           <p className="text-foreground-muted text-center py-8">No booking requests yet</p>
         ) : (
           <>
-            {paginatedBookings.map((booking) => (
+            {paginatedBookings.map((booking: Booking) => (
             <motion.div
               key={booking.id}
               initial={{ opacity: 0, y: 10 }}
@@ -242,9 +243,33 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                       <p className="text-foreground-default">Payment ID: <strong className="font-mono text-sm">{selectedBooking.payment_id}</strong></p>
                     )}
                     <div className="mt-2 pt-2 border-t border-border">
-                      <p className="text-foreground-default">Status: <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedBooking.status)}`}>
-                        {selectedBooking.status}
-                      </span></p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-foreground-default">Status:</p>
+                        {(selectedBooking.status === 'accepted' || selectedBooking.status === 'rejected') ? (
+                          // Static pill for finalized statuses
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedBooking.status)}`}>
+                            {selectedBooking.status} (Final)
+                          </span>
+                        ) : (
+                          // Dropdown for pending/waitlist statuses
+                          <select
+                            value={selectedBooking.status}
+                            onChange={(e) => {
+                              const newStatus = e.target.value as 'accepted' | 'rejected' | 'waitlist';
+                              if (window.confirm(`Are you sure you want to change status to ${newStatus}?`)) {
+                                handleUpdateStatus(selectedBooking.id, newStatus);
+                              }
+                            }}
+                            disabled={processing}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(selectedBooking.status)}`}
+                          >
+                            {selectedBooking.status === 'pending' && <option value="pending">Pending</option>}
+                            {selectedBooking.status === 'waitlist' && <option value="waitlist">Waitlist</option>}
+                            <option value="accepted">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                          </select>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -277,71 +302,49 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
               </div>
 
               <div className="flex flex-col gap-3">
-                {selectedBooking.status === 'waitlist' ? (
-                  // Waitlist actions
+                {(selectedBooking.status === 'accepted' || selectedBooking.status === 'rejected') ? (
+                  // Finalized bookings - no actions available
                   <>
                     <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-2">
                       <p className="text-sm text-blue-800 dark:text-blue-400">
-                        This student is on the waitlist. You can admit them if seats become available, or permanently cancel their booking.
+                        This booking has been finalized and cannot be changed. The status is permanent.
                       </p>
                     </div>
                     <button
-                      onClick={() => handleUpdateStatus(selectedBooking.id, 'accepted')}
-                      disabled={processing}
-                      className="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                      onClick={() => setShowProof(false)}
+                      className="w-full py-2 bg-surface text-foreground-default rounded-lg hover:bg-border transition-colors"
                     >
-                      <UserCheck className="w-5 h-5 mr-2" />
-                      {processing ? 'Processing...' : 'Accept & Admit from Waitlist'}
+                      Close
                     </button>
-                    <button
-                      onClick={() => handleUpdateStatus(selectedBooking.id, 'rejected')}
-                      disabled={processing}
-                      className="w-full py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center"
-                    >
-                      <Ban className="w-5 h-5 mr-2" />
-                      {processing ? 'Processing...' : 'Permanently Reject'}
-                    </button>
+                  </>
+                ) : selectedBooking.status === 'waitlist' ? (
+                  // Waitlist actions
+                  <>
+                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3 mb-2">
+                      <p className="text-sm text-orange-800 dark:text-orange-400">
+                        This student is on the waitlist. Use the status dropdown above to accept or reject their booking.
+                      </p>
+                    </div>
                     <button
                       onClick={() => setShowProof(false)}
-                      className="w-full py-2 text-foreground-muted hover:text-foreground-default transition-colors"
+                      className="w-full py-2 bg-surface text-foreground-default rounded-lg hover:bg-border transition-colors"
                     >
-                      Cancel
+                      Close
                     </button>
                   </>
                 ) : (
                   // Pending actions
                   <>
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleUpdateStatus(selectedBooking.id, 'accepted')}
-                        disabled={processing}
-                        className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center"
-                      >
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        {processing ? 'Processing...' : 'Accept'}
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(selectedBooking.id, 'waitlist')}
-                        disabled={processing}
-                        className="flex-1 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors flex items-center justify-center"
-                      >
-                        <Clock className="w-5 h-5 mr-2" />
-                        {processing ? 'Processing...' : 'Waitlist'}
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(selectedBooking.id, 'rejected')}
-                        disabled={processing}
-                        className="flex-1 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center"
-                      >
-                        <XCircle className="w-5 h-5 mr-2" />
-                        {processing ? 'Processing...' : 'Reject'}
-                      </button>
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-2">
+                      <p className="text-sm text-yellow-800 dark:text-yellow-400">
+                        This booking is pending review. Use the status dropdown above to accept, waitlist, or reject.
+                      </p>
                     </div>
                     <button
                       onClick={() => setShowProof(false)}
-                      className="w-full py-2 text-foreground-muted hover:text-foreground-default transition-colors mt-2"
+                      className="w-full py-2 bg-surface text-foreground-default rounded-lg hover:bg-border transition-colors"
                     >
-                      Cancel
+                      Close
                     </button>
                   </>
                 )}
