@@ -62,6 +62,10 @@ class API {
       logger.error('API GET error', { path, status: res.status, detail });
       throw err;
     }
+    return data;
+  }
+
+  async post(path: string, body: any) {
     logger.api('POST', path, body);
     const res = await fetch(`${this.base}${path}`, {
       method: 'POST',
@@ -89,17 +93,14 @@ class API {
       const err: any = new Error(detail);
       err.status = res.status;
       err.payload = data;
-      logger.error('API POST error', { path, status: res.status, detail })
-      const detail = data?.detail || data?.message || data || res.statusText;
-      const err: any = new Error(detail);
-      err.status = res.status;
-      err.payload = data;
+      logger.error('API POST error', { path, status: res.status, detail });
       throw err;
     }
     return data;
   }
 
   async put(path: string, body: any) {
+    logger.api('PUT', path, body);
     const res = await fetch(`${this.base}${path}`, {
       method: 'PUT',
       headers: {
@@ -116,16 +117,23 @@ class API {
       // not json
       data = text;
     }
+    logger.apiResponse(path, res.status, data);
     if (!res.ok) {
       if (res.status === 401) {
+        logger.auth('Unauthorized - redirecting to login');
         this.handleUnauthorized();
       }
       const detail = data?.detail || data?.message || data || res.statusText;
       const err: any = new Error(detail);
       err.status = res.status;
       err.payload = data;
+      logger.error('API PUT error', { path, status: res.status, detail });
       throw err;
     }
+    return data;
+  }
+
+  async patch(path: string, body: any) {
     logger.api('PATCH', path, body);
     const res = await fetch(`${this.base}${path}`, {
       method: 'PATCH',
@@ -153,17 +161,14 @@ class API {
       const err: any = new Error(detail);
       err.status = res.status;
       err.payload = data;
-      logger.error('API PATCH error', { path, status: res.status, detail })
-      const detail = data?.detail || data?.message || data || res.statusText;
-      const err: any = new Error(detail);
-      err.status = res.status;
-      err.payload = data;
+      logger.error('API PATCH error', { path, status: res.status, detail });
       throw err;
     }
     return data;
   }
 
   async delete(path: string) {
+    logger.api('DELETE', path);
     const res = await fetch(`${this.base}${path}`, {
       method: 'DELETE',
       headers: {
@@ -181,20 +186,24 @@ class API {
       // not json
       data = text;
     }
+    logger.apiResponse(path, res.status, data);
     if (!res.ok) {
       if (res.status === 401) {
+        logger.auth('Unauthorized - redirecting to login');
         this.handleUnauthorized();
       }
       const detail = data?.detail || data?.message || data || res.statusText;
       const err: any = new Error(detail);
       err.status = res.status;
       err.payload = data;
+      logger.error('API DELETE error', { path, status: res.status, detail });
       throw err;
     }
     return data;
   }
 
   async upload(path: string, formData: FormData) {
+    logger.api('UPLOAD', path);
     const res = await fetch(`${this.base}${path}`, {
       method: 'POST',
       headers: {
@@ -211,14 +220,17 @@ class API {
       // not json
       data = text;
     }
+    logger.apiResponse(path, res.status, data);
     if (!res.ok) {
       if (res.status === 401) {
+        logger.auth('Unauthorized - redirecting to login');
         this.handleUnauthorized();
       }
       const detail = data?.detail || data?.message || data || res.statusText;
       const err: any = new Error(detail);
       err.status = res.status;
       err.payload = data;
+      logger.error('API UPLOAD error', { path, status: res.status, detail });
       throw err;
     }
     return data;
