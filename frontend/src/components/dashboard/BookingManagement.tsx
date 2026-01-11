@@ -4,6 +4,7 @@ import { CheckCircle, XCircle, Eye, Clock, ChevronLeft, ChevronRight, UserCheck,
 import { Booking } from '../../types';
 import { toast } from 'react-hot-toast';
 import { BookingsService } from '../../services/bookings.service';
+import logger from '../../utils/logger';
 
 interface BookingManagementProps {
   bookings: Booking[];
@@ -11,6 +12,8 @@ interface BookingManagementProps {
 }
 
 const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdate }) => {
+  logger.lifecycle('BookingManagement', 'Component rendered', { bookingCount: bookings.length });
+  
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showProof, setShowProof] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -25,12 +28,15 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
   const handleUpdateStatus = async (bookingId: number, status: 'accepted' | 'rejected' | 'waitlist') => {
     try {
       setProcessing(true);
-      await BookingsService.updateBookingStatus(bookingId, { status });
-      toast.success(`Booking ${status}!`);
+      console.log(`Updating booking ${bookingId} to status: ${status}`);
+      const result = await BookingsService.updateBookingStatus(bookingId, { status });
+      console.log('Booking updated successfully:', result);
+      toast.success(`Booking ${status === 'accepted' ? 'accepted' : status === 'rejected' ? 'rejected' : 'waitlisted'}!`);
       onUpdate();
       setShowProof(false);
       setSelectedBooking(null);
     } catch (error: any) {
+      console.error('Error updating booking status:', error);
       toast.error(error.message || `Failed to ${status} booking`);
     } finally {
       setProcessing(false);
@@ -38,6 +44,7 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
   };
 
   const viewPaymentProof = (booking: Booking) => {
+    logger.interaction('View payment proof modal', { bookingId: booking.id, status: booking.status });
     setSelectedBooking(booking);
     setShowProof(true);
   };
@@ -100,13 +107,19 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                       className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center space-x-2 text-sm shadow-lg shadow-primary/30"
                     >
                       <Eye className="w-4 h-4" />
-                      <span>View & Manage</span>
+                      <span>{booking.status === 'waitlist' ? 'Manage Waitlist' : 'View & Manage'}</span>
                     </button>
                   )}
                   {!booking.payment_screenshot && booking.status === 'pending' && (
                     <div className="flex items-center space-x-2 text-xs text-yellow-600">
                       <Clock className="w-4 h-4" />
                       <span>Awaiting payment proof</span>
+                    </div>
+                  )}
+                  {booking.status === 'waitlist' && !booking.payment_screenshot && (
+                    <div className="flex items-center space-x-2 text-xs text-orange-600">
+                      <Clock className="w-4 h-4" />
+                      <span>On waitlist</span>
                     </div>
                   )}
                 </div>

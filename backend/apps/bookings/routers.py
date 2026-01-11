@@ -10,6 +10,7 @@ from apps.bookings.services import BookingService, AdminSettingsService
 from apps.accounts.services.authenticate import AccountService
 from apps.accounts.models import User
 from apps.core.cloudinary_service import CloudinaryService
+from apps.core.logger import log
 from config.database import get_db
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
@@ -44,12 +45,17 @@ def create_booking(
     service: BookingService = Depends(get_booking_service),
 ):
     """Create a new booking with quantity and payment proof"""
+    log.api("POST /bookings/", user_id=current_user.id, listing_id=data.listing_id)
+    log.info("Creating new booking", user_id=current_user.id, quantity=data.quantity)
+    
     booking = service.create_booking(
         data, 
         user_id=current_user.id,
         payment_id=data.payment_id,
         payment_screenshot=data.payment_screenshot
     )
+    
+    log.info("Booking created successfully", booking_id=booking.id, amount=float(booking.amount))
     return booking
 
 
@@ -79,10 +85,15 @@ def update_booking_status(
     current_user: User = Depends(AccountService.current_user),
     service: BookingService = Depends(get_booking_service),
 ):
-    """Lister can accept/reject/waitlist a booking"""
+    """Lister can accept/reject/waitlist a booking. Supports all status transitions including waitlist->accepted."""
+    log.api(f"PATCH /bookings/{booking_id}/status", user_id=current_user.id, new_status=data.status)
+    
     booking = service.get_booking(booking_id)
     if not booking:
+        log.warn("Booking not found", booking_id=booking_id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
+    
+    log.info("Updating booking status", booking_id=booking_id, old_status=booking.status, new_status=data.status)
     
     # Check if current user is the owner of the listing
     from apps.listings.services import ListingService
@@ -90,12 +101,27 @@ def update_booking_status(
     listing = listing_service.get_listing(booking.listing_id)
     
     if not listing or listing.owner_id != current_user.id:
+        log.warn("Unauthorized status update attempt", booking_id=booking_id, user_id=current_user.id)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
     
-    if data.status not in ["accepted", "rejected", "waitlist"]:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid status. Must be: accepted, rejected, or waitlist")
+    # Validate status
+    valid_statuses = ["accepted", "rejected", "waitlist"]
+    if data.status not in valid_statuses:
+        log.warn("Invalid status", booking_id=booking_id, attempted_status=data.status)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
+        )
     
-    return service.update_booking_status(booking_id, data.status)
+    # Update status (allows any transition: pending->accepted, pending->waitlist, waitlist->accepted, etc.)
+    updated_booking = service.update_booking_status(booking_id, data.status)
+    
+    if not updated_booking:
+        log.error("Failed to update booking status", booking_id=booking_id)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update booking status")
+    
+    log.info("Booking status updated successfully", booking_id=booking_id, new_status=data.status)
+    return updated_booking
 
 
 @router.get("/", response_model=BookingListOut)
@@ -105,22 +131,31 @@ async def list_bookings(
     service: BookingService = Depends(get_booking_service),
 ):
     """List bookings for the current user or their listings"""
+    log.api("GET /bookings/", user_id=current_user.id, listing_id=listing_id, user_role=current_user.role)
+    
     # If user is a listing owner, show bookings for their listings
     if current_user.role in ['hostel', 'coaching', 'library', 'tiffin']:
+        log.info("Fetching bookings for lister", user_id=current_user.id, role=current_user.role)
         from apps.listings.services import ListingService
         listing_service = ListingService(service.db)
         my_listings = listing_service.list_listings(owner_id=current_user.id)
         listing_ids = [l.id for l in my_listings]
+        
+        log.debug("Lister owns listings", user_id=current_user.id, listing_count=len(listing_ids))
         
         # Get all bookings for owner's listings
         all_bookings = []
         for lid in listing_ids:
             bookings = service.list_bookings(listing_id=lid)
             all_bookings.extend(bookings)
+        
+        log.info("Fetched bookings for lister", user_id=current_user.id, booking_count=len(all_bookings))
         return {"bookings": all_bookings, "total": len(all_bookings)}
     
     # For regular users, show their bookings
+    log.info("Fetching bookings for user", user_id=current_user.id)
     bookings = service.list_bookings(user_id=current_user.id, listing_id=listing_id)
+    log.info("Fetched user bookings", user_id=current_user.id, booking_count=len(bookings))
     return {"bookings": bookings, "total": len(bookings)}
 
 

@@ -1,4 +1,6 @@
 // Vite exposes env on import.meta.env. VITE_API_URL must be set
+import logger from './logger';
+
 const env = import.meta.env;
 const API_BASE = env.VITE_API_URL;
 
@@ -32,6 +34,7 @@ class API {
   }
 
   async get(path: string) {
+    logger.api('GET', path);
     const res = await fetch(`${this.base}${path}`, {
       method: 'GET',
       headers: {
@@ -46,20 +49,20 @@ class API {
       // not json
       data = text;
     }
+    logger.apiResponse(path, res.status, data);
     if (!res.ok) {
       if (res.status === 401) {
+        logger.auth('Unauthorized - redirecting to login');
         this.handleUnauthorized();
       }
       const detail = data?.detail || data?.message || data || res.statusText;
       const err: any = new Error(detail);
       err.status = res.status;
       err.payload = data;
+      logger.error('API GET error', { path, status: res.status, detail });
       throw err;
     }
-    return data;
-  }
-
-  async post(path: string, body: any) {
+    logger.api('POST', path, body);
     const res = await fetch(`${this.base}${path}`, {
       method: 'POST',
       headers: {
@@ -76,10 +79,17 @@ class API {
       // not json
       data = text;
     }
+    logger.apiResponse(path, res.status, data);
     if (!res.ok) {
       if (res.status === 401) {
+        logger.auth('Unauthorized - redirecting to login');
         this.handleUnauthorized();
       }
+      const detail = data?.detail || data?.message || data || res.statusText;
+      const err: any = new Error(detail);
+      err.status = res.status;
+      err.payload = data;
+      logger.error('API POST error', { path, status: res.status, detail })
       const detail = data?.detail || data?.message || data || res.statusText;
       const err: any = new Error(detail);
       err.status = res.status;
@@ -116,10 +126,7 @@ class API {
       err.payload = data;
       throw err;
     }
-    return data;
-  }
-
-  async patch(path: string, body: any) {
+    logger.api('PATCH', path, body);
     const res = await fetch(`${this.base}${path}`, {
       method: 'PATCH',
       headers: {
@@ -136,10 +143,17 @@ class API {
       // not json
       data = text;
     }
+    logger.apiResponse(path, res.status, data);
     if (!res.ok) {
       if (res.status === 401) {
+        logger.auth('Unauthorized - redirecting to login');
         this.handleUnauthorized();
       }
+      const detail = data?.detail || data?.message || data || res.statusText;
+      const err: any = new Error(detail);
+      err.status = res.status;
+      err.payload = data;
+      logger.error('API PATCH error', { path, status: res.status, detail })
       const detail = data?.detail || data?.message || data || res.statusText;
       const err: any = new Error(detail);
       err.status = res.status;
