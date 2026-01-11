@@ -48,6 +48,8 @@ const AdminPaymentVerificationPage: React.FC = () => {
 
     try {
       setProcessing(true);
+      console.log('Verifying payment:', { bookingId: selectedBooking.id, paymentStatus, notes: verificationNotes });
+      
       await BookingsService.verifyPayment(
         selectedBooking.id,
         paymentStatus,
@@ -61,13 +63,13 @@ const AdminPaymentVerificationPage: React.FC = () => {
       };
       
       toast.success(statusMessages[paymentStatus]);
-      loadBookings();
+      await loadBookings(); // Reload bookings to show updated status
       setShowModal(false);
       setSelectedBooking(null);
       setVerificationNotes('');
     } catch (error: any) {
       console.error('Failed to verify payment:', error);
-      toast.error('Failed to update payment status');
+      toast.error(error.response?.data?.detail || error.message || 'Failed to update payment status');
     } finally {
       setProcessing(false);
     }
@@ -80,8 +82,8 @@ const AdminPaymentVerificationPage: React.FC = () => {
   };
 
   const filteredBookings = (bookings || []).filter(booking => {
-    if (filter === 'unverified') return !booking.payment_verified && booking.payment_screenshot;
-    if (filter === 'verified') return booking.payment_verified;
+    if (filter === 'unverified') return booking.payment_status === 'pending' && booking.payment_screenshot;
+    if (filter === 'verified') return booking.payment_status === 'verified';
     return true;
   });
 
@@ -109,7 +111,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
               : 'bg-surface text-foreground-muted hover:bg-primary/10'
           }`}
         >
-          Pending Verification ({(bookings || []).filter(b => !b.payment_verified && b.payment_screenshot).length})
+          Pending Verification ({(bookings || []).filter(b => b.payment_status === 'pending' && b.payment_screenshot).length})
         </button>
         <button
           onClick={() => setFilter('verified')}
@@ -119,7 +121,7 @@ const AdminPaymentVerificationPage: React.FC = () => {
               : 'bg-surface text-foreground-muted hover:bg-green-500/10'
           }`}
         >
-          Verified ({(bookings || []).filter(b => b.payment_verified).length})
+          Verified ({(bookings || []).filter(b => b.payment_status === 'verified').length})
         </button>
         <button
           onClick={() => setFilter('all')}
@@ -254,13 +256,13 @@ const AdminPaymentVerificationPage: React.FC = () => {
                       View Screenshot
                     </a>
                   )}
-                  {!booking.payment_verified && booking.payment_screenshot && (
+                  {booking.payment_screenshot && (
                     <button
                       onClick={() => openVerificationModal(booking)}
                       className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center gap-2 text-sm font-semibold shadow-lg shadow-primary/30"
                     >
                       <CheckCircle className="w-4 h-4" />
-                      Verify Payment
+                      {booking.payment_status === 'verified' ? 'Re-verify' : 'Verify Payment'}
                     </button>
                   )}
                   {!booking.payment_screenshot && (

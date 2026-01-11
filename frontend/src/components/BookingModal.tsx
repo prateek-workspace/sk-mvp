@@ -168,13 +168,15 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
 
     try {
       setLoading(true);
-      toast.loading('Creating booking...');
+      const loadingToast = toast.loading('Creating booking...');
 
       let screenshotUrl: string | null = null;
       
       // Upload screenshot to Cloudinary if provided
       if (paymentScreenshot) {
+        toast.loading('Uploading payment proof...', { id: loadingToast });
         screenshotUrl = await uploadToCloudinary(paymentScreenshot);
+        toast.loading('Finalizing booking...', { id: loadingToast });
       }
 
       // Create booking with payment proof
@@ -185,7 +187,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
         payment_screenshot: screenshotUrl || undefined,
       });
 
-      toast.dismiss();
+      toast.dismiss(loadingToast);
       toast.success('Booking created successfully!');
       onSuccess();
       onClose();
@@ -366,7 +368,12 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                   </label>
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <button
-                      onClick={() => setPaymentMethod('screenshot')}
+                      onClick={() => {
+                        setPaymentMethod('screenshot');
+                        if (!paymentScreenshot && !cameraActive) {
+                          setTimeout(() => startCamera(), 100);
+                        }
+                      }}
                       className={`py-3 px-4 rounded-lg border-2 font-medium transition-colors ${
                         paymentMethod === 'screenshot'
                           ? 'border-primary bg-primary/10 text-primary'
@@ -377,7 +384,10 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                       Screenshot
                     </button>
                     <button
-                      onClick={() => setPaymentMethod('transaction_id')}
+                      onClick={() => {
+                        setPaymentMethod('transaction_id');
+                        stopCamera();
+                      }}
                       className={`py-3 px-4 rounded-lg border-2 font-medium transition-colors ${
                         paymentMethod === 'transaction_id'
                           ? 'border-primary bg-primary/10 text-primary'
@@ -394,71 +404,83 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                     <div className="space-y-4">
                       {paymentScreenshot ? (
                         <div className="space-y-3">
-                          <div className="border border-border rounded-lg overflow-hidden">
+                          <div className="border-2 border-green-500 rounded-lg overflow-hidden bg-surface">
                             <img 
                               src={paymentScreenshot} 
                               alt="Payment screenshot" 
-                              className="w-full h-64 object-contain bg-surface rounded-lg"
+                              className="w-full h-80 object-contain bg-surface"
                             />
+                          </div>
+                          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <span className="text-sm text-green-700 dark:text-green-400 font-medium">Photo captured successfully!</span>
                           </div>
                           <div className="flex gap-2">
                             <button
                               onClick={() => {
                                 setPaymentScreenshot(null);
-                                stopCamera();
+                                setTimeout(() => startCamera(), 100);
                               }}
                               className="flex-1 py-2 bg-surface text-foreground-default rounded-lg font-medium hover:bg-border transition-colors"
                             >
-                              Remove
+                              Retake Photo
                             </button>
                             <button
                               onClick={() => fileInputRef.current?.click()}
                               className="flex-1 py-2 bg-surface text-foreground-default rounded-lg font-medium hover:bg-border transition-colors"
                             >
-                              Change
+                              Upload Instead
                             </button>
                           </div>
                         </div>
                       ) : cameraActive ? (
                         <div className="space-y-3">
-                          <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            className="w-full h-64 object-cover rounded-lg bg-black"
-                          />
+                          <div className="relative border-2 border-primary rounded-lg overflow-hidden bg-black">
+                            <video
+                              ref={videoRef}
+                              autoPlay
+                              playsInline
+                              muted
+                              className="w-full h-80 object-cover rounded-lg"
+                            />
+                            <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 animate-pulse">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                              LIVE
+                            </div>
+                          </div>
                           <canvas ref={canvasRef} className="hidden" />
                           <div className="flex gap-2">
                             <button
                               onClick={capturePhoto}
-                              className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
+                              className="flex-1 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
                             >
                               <Camera className="w-5 h-5" />
                               Capture Photo
                             </button>
                             <button
                               onClick={stopCamera}
-                              className="px-4 py-3 bg-surface text-foreground-default rounded-lg font-medium hover:bg-border transition-colors"
+                              className="px-6 py-4 bg-surface text-foreground-default rounded-lg font-medium hover:bg-border transition-colors"
                             >
                               Cancel
                             </button>
                           </div>
+                          <p className="text-xs text-center text-foreground-muted">
+                            Position your payment screenshot in the frame and click Capture
+                          </p>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            onClick={startCamera}
-                            className="py-3 px-4 bg-surface hover:bg-border rounded-lg font-medium transition-colors inline-flex items-center justify-center gap-2"
-                          >
-                            <Camera className="w-5 h-5" />
-                            Take Photo
-                          </button>
+                        <div className="space-y-3">
+                          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-center">
+                            <Camera className="w-12 h-12 text-blue-600 mx-auto mb-2" />
+                            <p className="text-sm text-blue-700 dark:text-blue-400 mb-3">Camera will start automatically</p>
+                            <div className="text-xs text-blue-600 dark:text-blue-500">or</div>
+                          </div>
                           <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="py-3 px-4 bg-surface hover:bg-border rounded-lg font-medium transition-colors inline-flex items-center justify-center gap-2"
+                            className="w-full py-3 px-4 bg-surface hover:bg-border rounded-lg font-medium transition-colors inline-flex items-center justify-center gap-2 border-2 border-border"
                           >
                             <Upload className="w-5 h-5" />
-                            Upload File
+                            Upload File Instead
                           </button>
                         </div>
                       )}
@@ -469,9 +491,6 @@ const BookingModal: React.FC<BookingModalProps> = ({ listing, onClose, onSuccess
                         onChange={handleFileUpload}
                         className="hidden"
                       />
-                      <p className="text-xs text-foreground-muted">
-                        Capture or upload your payment screenshot
-                      </p>
                     </div>
                   ) : (
                     <div className="space-y-3">
