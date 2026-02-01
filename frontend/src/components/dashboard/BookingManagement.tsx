@@ -249,23 +249,29 @@ const BookingManagement: React.FC<BookingManagementProps> = ({ bookings, onUpdat
                   </div>
                 </div>
 
-                {selectedBooking.payment_screenshot ? (
-                  <div>
-                    <p className="text-sm text-foreground-muted mb-2">Payment Screenshot</p>
-                    <img 
-                      src={selectedBooking.payment_screenshot} 
-                      alt="Payment proof" 
-                      className="w-full rounded-lg border border-border"
-                    />
-                  </div>
-                ) : selectedBooking.payment_id ? (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                    <p className="text-sm text-green-800 dark:text-green-400 mb-2">
-                      ✓ Payment proof submitted via Transaction ID
-                    </p>
-                    <p className="text-xs text-green-700 dark:text-green-500">
-                      Transaction ID is displayed in the booking details above.
-                    </p>
+                {/* Payment Proof Section */}
+                {selectedBooking.payment_screenshot || selectedBooking.payment_id ? (
+                  <div className="space-y-4">
+                    {selectedBooking.payment_screenshot && (
+                      <div>
+                        <p className="text-sm text-foreground-muted mb-2">Payment Screenshot</p>
+                        <img 
+                          src={selectedBooking.payment_screenshot} 
+                          alt="Payment proof" 
+                          className="w-full rounded-lg border border-border"
+                        />
+                      </div>
+                    )}
+                    {selectedBooking.payment_id && (
+                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                        <p className="text-sm text-green-800 dark:text-green-400 font-medium mb-2">
+                          ✓ Transaction ID Provided
+                        </p>
+                        <p className="text-xs text-green-700 dark:text-green-500">
+                          The transaction ID is shown in the booking details above.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
