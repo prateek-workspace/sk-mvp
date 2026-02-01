@@ -18,10 +18,11 @@ const ListingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
-  const [bookingListing, setBookingListing] = useState<Listing | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listingToBook, setListingToBook] = useState<Listing | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   const category = searchParams.get('category');
 
@@ -73,14 +74,15 @@ const ListingsPage: React.FC = () => {
     }
     
     setSelectedListing(null);
-    setBookingListing(listing);
+    setListingToBook(listing);
+    setShowBookingModal(true);
   };
 
   const handleBookingSuccess = () => {
-    setBookingListing(null);
-    toast.success('Booking created successfully! Awaiting approval.');
-    // Optionally navigate to bookings page
-    // navigate('/dashboard/user/bookings');
+    setShowBookingModal(false);
+    setListingToBook(null);
+    fetchListings(); // Refresh listings
+    navigate('/dashboard/user/bookings');
   };
 
   const handlePageChange = (page: number) => {
@@ -160,10 +162,13 @@ const ListingsPage: React.FC = () => {
         onBook={handleBookNow}
       />
 
-      {bookingListing && (
+      {showBookingModal && listingToBook && (
         <BookingModal
-          listing={bookingListing}
-          onClose={() => setBookingListing(null)}
+          listing={listingToBook}
+          onClose={() => {
+            setShowBookingModal(false);
+            setListingToBook(null);
+          }}
           onSuccess={handleBookingSuccess}
         />
       )}

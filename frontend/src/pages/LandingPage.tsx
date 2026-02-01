@@ -16,12 +16,12 @@ import {
 import Navbar from '../components/Navbar';
 import ListingCard from '../components/ListingCard';
 import ListingDetailsModal from '../components/ListingDetailsModal';
+import BookingModal from '../components/BookingModal';
 import FloatingElements from '../components/FloatingElements';
 import { Listing } from '../types';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ListingsService } from '../services/listings.service';
-import { BookingsService } from '../services/bookings.service';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,6 +29,8 @@ const LandingPage: React.FC = () => {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listingToBook, setListingToBook] = useState<Listing | null>(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     fetchListings();
@@ -50,7 +52,7 @@ const LandingPage: React.FC = () => {
     setSelectedListing(listing);
   };
 
-  const handleBookNow = async (listing: Listing) => {
+  const handleBookNow = (listing: Listing) => {
     if (!user) {
       toast.error('Please log in to make a booking.');
       navigate('/login');
@@ -61,21 +63,16 @@ const LandingPage: React.FC = () => {
       return;
     }
     
-    try {
-      const response = await BookingsService.createBooking({
-        listing_id: listing.id,
-        quantity: 1,
-      });
+    setSelectedListing(null);
+    setListingToBook(listing);
+    setShowBookingModal(true);
+  };
 
-      if (response?.booking) {
-        setSelectedListing(null);
-        toast.success('Booking request sent successfully!');
-        navigate(`/dashboard/${user.role}/bookings`);
-      }
-    } catch (error: any) {
-      console.error('Booking error:', error);
-      toast.error(error.message || 'Failed to create booking');
-    }
+  const handleBookingSuccess = () => {
+    setShowBookingModal(false);
+    setListingToBook(null);
+    fetchListings();
+    navigate(`/dashboard/${user?.role || 'user'}/bookings`);
   };
 
   const handleContactSubmit = (e: React.FormEvent) => {
@@ -104,6 +101,16 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <ListingDetailsModal listing={selectedListing} onClose={() => setSelectedListing(null)} onBook={handleBookNow} />
+      {showBookingModal && listingToBook && (
+        <BookingModal
+          listing={listingToBook}
+          onClose={() => {
+            setShowBookingModal(false);
+            setListingToBook(null);
+          }}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
       
       <main>
         {/* Hero Section */}
