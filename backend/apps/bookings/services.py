@@ -163,6 +163,7 @@ class BookingService:
         
         if payment_status == PaymentStatus.verified.value:
             booking.payment_verified_at = datetime.utcnow()
+            booking.status= "accepted"
         elif payment_status == PaymentStatus.fake.value:
             # Cancel the booking if payment is fake
             booking.status = "cancelled"
@@ -170,6 +171,7 @@ class BookingService:
         else:
             # Pending - reset verification timestamp
             booking.payment_verified_at = None
+            booking.status = "pending"
         
         booking.updated_at = datetime.utcnow()
         

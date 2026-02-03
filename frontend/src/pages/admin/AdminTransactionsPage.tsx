@@ -84,17 +84,28 @@ const AdminTransactionsPage: React.FC = () => {
     setFilteredTransactions(filtered);
   };
 
-  const handleVerifyPayment = async (transactionId: number, verified: boolean) => {
+  const handleVerifyPayment = async (
+    transactionId: number,
+    paymentStatus: "verified" | "pending"
+  ) => {
     try {
       await api.patch(`/bookings/${transactionId}/verify-payment`, {
-        payment_verified: verified
+        payment_status: paymentStatus,
       });
-      toast.success(verified ? 'Payment verified' : 'Payment verification removed');
+
+      toast.success(
+        paymentStatus === "verified"
+          ? "Payment verified"
+          : "Payment verification removed"
+      );
+
       fetchTransactions();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update payment verification');
+      const detail = error?.response?.data?.detail;
+      toast.error(Array.isArray(detail) ? detail[0]?.msg : "Action failed");
     }
   };
+
 
   const getStatusBadge = (status: string) => {
     const styles = {
@@ -475,7 +486,7 @@ const AdminTransactionsPage: React.FC = () => {
                 {!selectedTransaction.payment_verified && (selectedTransaction.payment_id || selectedTransaction.payment_screenshot) && (
                   <button
                     onClick={() => {
-                      handleVerifyPayment(selectedTransaction.id, true);
+                      handleVerifyPayment(selectedTransaction.id, "verified");
                       setSelectedTransaction(null);
                     }}
                     className="flex-1 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors"
@@ -486,7 +497,7 @@ const AdminTransactionsPage: React.FC = () => {
                 {selectedTransaction.payment_verified && (
                   <button
                     onClick={() => {
-                      handleVerifyPayment(selectedTransaction.id, false);
+                      handleVerifyPayment(selectedTransaction.id, 'pending');
                       setSelectedTransaction(null);
                     }}
                     className="flex-1 py-2 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
