@@ -29,6 +29,18 @@ interface Transaction {
   payment_screenshot: string | null;
   payment_verified: boolean;
   created_at: string;
+
+  user: {
+    id: number;
+    email: string;
+    name: string;
+  } | null;
+
+  listing: {
+    id: number;
+    name: string;
+    type: string;
+  } | null;
 }
 
 const AdminTransactionsPage: React.FC = () => {
@@ -258,10 +270,10 @@ const AdminTransactionsPage: React.FC = () => {
                     </div>
                     <div className="space-y-1 mb-3 text-xs">
                       <p className="text-foreground-muted">
-                        User: <span className="text-foreground-default font-medium">{transaction.user_name}</span>
+                        User: <span className="text-foreground-default font-medium">{transaction.user?.name || "N/A"}</span>
                       </p>
                       <p className="text-foreground-muted">
-                        Email: <span className="text-foreground-default">{transaction.user_email}</span>
+                        Email: <span className="text-foreground-default">{transaction.user?.email || "N/A"}</span>
                       </p>
                       <p className="text-foreground-muted">
                         Quantity: <span className="text-foreground-default font-medium">{transaction.quantity}</span>
@@ -429,11 +441,11 @@ const AdminTransactionsPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-foreground-muted">Email</p>
-                    <p className="font-semibold text-foreground-default">{selectedTransaction.user_email}</p>
+                    <p className="font-semibold text-foreground-default">{selectedTransaction.user?.email ?? "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-foreground-muted">Name</p>
-                    <p className="font-semibold text-foreground-default">{selectedTransaction.user_name || 'N/A'}</p>
+                    <p className="font-semibold text-foreground-default">{selectedTransaction.user?.name ?? "N/A"}</p>
                   </div>
                 </div>
               </div>
@@ -444,11 +456,11 @@ const AdminTransactionsPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-foreground-muted">Name</p>
-                    <p className="font-semibold text-foreground-default">{selectedTransaction.listing_name}</p>
+                    <p className="font-semibold text-foreground-default">{selectedTransaction.listing?.name ?? "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm text-foreground-muted">Type</p>
-                    <p className="font-semibold text-foreground-default capitalize">{selectedTransaction.listing_type}</p>
+                    <p className="font-semibold text-foreground-default capitalize">{selectedTransaction.listing?.type ?? "N/A"}</p>
                   </div>
                 </div>
               </div>
