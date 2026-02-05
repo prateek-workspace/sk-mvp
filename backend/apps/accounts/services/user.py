@@ -191,6 +191,8 @@ class UserManager:
                 user.is_superuser = is_superuser
             if role is not None:
                 user.role = role
+                user.is_approved_lister = role != "user"
+
             if is_approved_lister is not None:
                 user.is_approved_lister = is_approved_lister
             if last_login is not None:
