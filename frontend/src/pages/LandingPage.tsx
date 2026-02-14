@@ -107,7 +107,7 @@ const LandingPage: React.FC = () => {
 };
 
   return (
-    <div className="min-h-screen bg-background">\
+    <div className="min-h-screen bg-background">
       <SEO
         title="Student Prep Hub - Your Complete Student Solutions Platform"
         description="Find the best coaching centers, hostels, PG accommodations, tiffin services, and libraries across India. Trusted by thousands of students."
