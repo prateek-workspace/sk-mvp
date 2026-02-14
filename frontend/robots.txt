@@ -1,0 +1,17 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /bookings
+Disallow: /manage-listings
+
+# Allow important public pages
+Allow: /listings
+Allow: /listings?category=*
+
+# Sitemap
+Sitemap: https://skstudentpath.com/sitemap.xml
