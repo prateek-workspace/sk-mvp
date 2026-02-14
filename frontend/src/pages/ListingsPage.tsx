@@ -11,6 +11,8 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ListingsService } from '../services/listings.service';
 
+import SEO from '../components/SEO';
+
 const LISTINGS_PER_PAGE = 8;
 
 const ListingsPage: React.FC = () => {
@@ -101,8 +103,28 @@ const ListingsPage: React.FC = () => {
     }
   }
 
+  const homepageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Student Prep Hub",
+    "url": "https://alpha.dualite.dev",
+    "description": "India's largest online rental community for students",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://alpha.dualite.dev/listings?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Student Prep Hub - Find Best Coaching, PG, Hostels, Libraries & Tiffin Services"
+        description="Discover and book verified coaching centers, PG accommodations, hostels, tiffin services, and libraries across 30+ cities in India. Join 2000+ students on India's largest student rental platform."
+        keywords="coaching centers, PG accommodation, student hostels, tiffin services, libraries, student preparation, exam coaching, affordable PG, student rentals India"
+        canonical="https://alpha.dualite.dev/"
+        schemaMarkup={homepageSchema}
+      />
       <Navbar />
 
       <main className="pt-28 pb-20">
