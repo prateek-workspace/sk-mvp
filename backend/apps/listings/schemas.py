@@ -38,6 +38,16 @@ class ListingUpdate(BaseModel):
     image_url: Optional[str] = None
 
 
+class ListingOwnerInfo(BaseModel):
+    """Basic owner info for listing cards"""
+    id: int
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    profile_image: Optional[str] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ListingOut(ListingBase):
     id: int
     owner_id: int
@@ -45,6 +55,7 @@ class ListingOut(ListingBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
     faculty: List[FacultyOut] = []
+    owner: Optional[ListingOwnerInfo] = None
     
     model_config = ConfigDict(from_attributes=True)
 

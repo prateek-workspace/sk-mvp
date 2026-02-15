@@ -77,6 +77,12 @@ class TokenService:
         UserVerification.update(UserVerification.filter(UserVerification.user_id == self.user_id).first().id,
                                 active_access_token=None)
 
+    def revoke_access_token(self):
+        """
+        Revoke the current access token (used for logout).
+        """
+        self.reset_access_token()
+
     @classmethod
     async def fetch_user(cls, token: str) -> User:
         """
@@ -146,9 +152,15 @@ class TokenService:
         _change = UserVerification.filter(UserVerification.user_id == self.user_id).first().id
         UserVerification.update(_change, new_email=None, request_type=None)
 
-    def reset_is_reset_password(self):
-        _change = UserVerification.filter(UserVerification.user_id == self.user_id).first().id
-        UserVerification.update(_change, request_type='reset-password')
+    def request_is_reset_password(self):
+        """
+        Set the request type to reset-password for OTP verification.
+        """
+        _change = UserVerification.filter(UserVerification.user_id == self.user_id).first()
+        if _change:
+            UserVerification.update(_change.id, request_type='reset-password')
+        else:
+            UserVerification.create(user_id=self.user_id, request_type='reset-password')
 
     def reset_otp_token_type(self):
         """

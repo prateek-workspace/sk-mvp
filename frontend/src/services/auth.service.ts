@@ -33,6 +33,30 @@ export interface VerifyOTPResponse {
   message: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  password: string;
+  password_confirm: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
+export interface ResendOTPRequest {
+  request_type: 'register' | 'reset-password' | 'change-email';
+  email: string;
+}
+
 export interface CurrentUserResponse {
   user: User;
 }
@@ -136,5 +160,26 @@ export class AuthService {
 
   static async resendOTP(email: string): Promise<void> {
     return api.post('/accounts/otp', { email });
+  }
+
+  // --------------------
+  // FORGOT PASSWORD
+  // --------------------
+  static async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+    return api.post('/accounts/reset-password', { email });
+  }
+
+  // --------------------
+  // RESET PASSWORD (with OTP)
+  // --------------------
+  static async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+    return api.patch('/accounts/reset-password/verify', data);
+  }
+
+  // --------------------
+  // RESEND OTP (for any purpose)
+  // --------------------
+  static async resendOTPWithType(data: ResendOTPRequest): Promise<void> {
+    return api.post('/accounts/otp', data);
   }
 }

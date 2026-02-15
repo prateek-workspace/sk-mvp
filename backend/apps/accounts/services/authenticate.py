@@ -117,3 +117,162 @@ class AccountService:
         if not PasswordManager.verify_password(password, user.password):
             return False
         return user
+
+    # --------------
+    # --- Logout ---
+    # --------------
+
+    @classmethod
+    def logout(cls, user: User):
+        token = TokenService(user)
+        token.revoke_access_token()
+
+    # ----------------------
+    # --- Reset Password ---
+    # ----------------------
+
+    @classmethod
+    def reset_password(cls, email: str):
+        user = UserManager.get_user(email=email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No account found with this email address."
+            )
+        
+        if not user.is_verified_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email not verified. Please verify your email first."
+            )
+
+        TokenService(user.id).request_is_reset_password()
+        EmailService.reset_password_send_verification_email(user.email)
+
+        return {
+            'message': 'Password reset OTP has been sent to your email address.'
+        }
+
+    @classmethod
+    def verify_reset_password(cls, email: str, otp: str, password: str):
+        user = UserManager.get_user(email=email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found."
+            )
+
+        token = TokenService(user=user)
+        if not token.validate_otp_token(otp):
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="Invalid OTP code. Please double-check and try again."
+            )
+
+        # Update password (update_user handles hashing)
+        UserManager.update_user(user.id, password=password)
+
+        token.reset_otp_token_type()
+
+        return {
+            'message': 'Your password has been reset successfully. Please login with your new password.'
+        }
+
+    # -----------------------
+    # --- Change Password ---
+    # -----------------------
+
+    @classmethod
+    def change_password(cls, user: User, current_password: str, password: str):
+        if not PasswordManager.verify_password(current_password, user.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect."
+            )
+
+        # Update password (update_user handles hashing)
+        UserManager.update_user(user.id, password=password)
+
+        # Revoke current token so user needs to login again
+        token = TokenService(user)
+        token.revoke_access_token()
+
+        return {
+            'message': 'Password changed successfully. Please login with your new password.'
+        }
+
+    # --------------------
+    # --- Change Email ---
+    # --------------------
+
+    @classmethod
+    def change_email(cls, user: User, new_email: str):
+        if UserManager.get_user(email=new_email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This email is already in use."
+            )
+
+        TokenService(user.id).request_is_change_email(new_email)
+        EmailService.change_email_send_verification_email(new_email)
+
+        return {
+            'message': 'Verification OTP has been sent to your new email address.'
+        }
+
+    @classmethod
+    def verify_change_email(cls, user: User, otp: str):
+        token = TokenService(user=user)
+        if not token.validate_otp_token(otp):
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="Invalid OTP code. Please double-check and try again."
+            )
+
+        new_email = token.get_new_email()
+        if not new_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No email change request found."
+            )
+
+        UserManager.update_user(user.id, email=new_email)
+        token.reset_otp_token_type()
+
+        return {
+            'message': 'Email address updated successfully.'
+        }
+
+    # -----------------
+    # --- Resend OTP ---
+    # -----------------
+
+    @classmethod
+    def resend_otp(cls, request_type: str, email: str):
+        user = UserManager.get_user(email=email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No account found with this email address."
+            )
+
+        if request_type == "register":
+            if user.is_verified_email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email is already verified."
+                )
+            TokenService(user.id).request_is_register()
+            EmailService.register_send_verification_email(user.email)
+        elif request_type == "reset-password":
+            TokenService(user.id).request_is_reset_password()
+            EmailService.reset_password_send_verification_email(user.email)
+        elif request_type == "change-email":
+            token = TokenService(user=user)
+            new_email = token.get_new_email()
+            if not new_email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="No email change request found."
+                )
+            EmailService.change_email_send_verification_email(new_email)

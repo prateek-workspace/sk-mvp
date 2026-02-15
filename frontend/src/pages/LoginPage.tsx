@@ -102,6 +102,11 @@ const LoginPage: React.FC = () => {
                   required
                 />
               </div>
+              <div className="flex justify-end mt-1">
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
 
             <button

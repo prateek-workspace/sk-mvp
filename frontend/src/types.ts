@@ -34,6 +34,14 @@ export interface Faculty {
   image_url?: string;
 }
 
+// Owner basic info for listing cards
+export interface ListingOwner {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  profile_image?: string;
+}
+
 // This type is now mainly for the mock data on the landing page.
 // The new Supabase-driven parts will use types generated from the DB schema.
 export interface Listing {
@@ -50,6 +58,7 @@ export interface Listing {
   amenities?: string[];
   reviews?: Review[];
   faculty?: Faculty[];
+  owner?: ListingOwner;
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;

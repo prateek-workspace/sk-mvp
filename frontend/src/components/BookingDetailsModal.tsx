@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { X, MapPin, Calendar, DollarSign, Hash, CheckCircle, XCircle, Clock, ImageIcon } from 'lucide-react';
 import { Booking } from '../types';
+import { formatDateIST, formatTimeIST, formatINR } from '../utils/dateUtils';
 
 interface BookingDetailsModalProps {
   booking: Booking;
@@ -80,7 +81,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
                   <p className="text-sm text-foreground-muted capitalize">{booking.listing?.type || 'N/A'}</p>
                 </div>
                 <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full">
-                  ₹{(booking.listing?.price || 0).toLocaleString('en-IN')} / month
+                  {formatINR(booking.listing?.price || 0)} / month
                 </span>
               </div>
               {(booking.listing as any)?.address && (
@@ -103,7 +104,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
               <div className="bg-surface rounded-lg p-4">
                 <p className="text-sm text-foreground-muted mb-1">Booking Date</p>
                 <p className="font-semibold text-foreground-default">
-                  {new Date(booking.created_at).toLocaleDateString('en-IN', {
+                  {formatDateIST(booking.created_at, {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -113,10 +114,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
               <div className="bg-surface rounded-lg p-4">
                 <p className="text-sm text-foreground-muted mb-1">Booking Time</p>
                 <p className="font-semibold text-foreground-default">
-                  {new Date(booking.created_at).toLocaleTimeString('en-IN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatTimeIST(booking.created_at)}
                 </p>
               </div>
               <div className="bg-surface rounded-lg p-4">
@@ -126,7 +124,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({ booking, onCl
               <div className="bg-surface rounded-lg p-4">
                 <p className="text-sm text-foreground-muted mb-1">Total Amount</p>
                 <p className="font-semibold text-foreground-default text-2xl text-primary">
-                  ₹{booking.amount.toLocaleString('en-IN')}
+                  {formatINR(booking.amount)}
                 </p>
               </div>
             </div>

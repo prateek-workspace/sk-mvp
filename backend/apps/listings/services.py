@@ -14,7 +14,10 @@ class ListingService:
 
     def list_listings(self, listing_type: Optional[str] = None, owner_id: Optional[int] = None) -> List[Listing]:
         """List all listings, optionally filtered by type or owner"""
-        query = select(Listing).options(selectinload(Listing.faculty))
+        query = select(Listing).options(
+            selectinload(Listing.faculty),
+            selectinload(Listing.owner)
+        )
         
         if listing_type:
             query = query.where(Listing.type == listing_type)
@@ -26,7 +29,10 @@ class ListingService:
 
     def get_listing(self, listing_id: int) -> Optional[Listing]:
         """Get a single listing by ID"""
-        query = select(Listing).options(selectinload(Listing.faculty)).where(Listing.id == listing_id)
+        query = select(Listing).options(
+            selectinload(Listing.faculty),
+            selectinload(Listing.owner)
+        ).where(Listing.id == listing_id)
         result = self.db.execute(query)
         return result.scalar_one_or_none()
 

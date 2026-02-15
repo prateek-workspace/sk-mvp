@@ -9,9 +9,28 @@ interface ListingCardProps {
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing, onViewDetails }) => {
+  // Get owner name from listing data, fallback to 'Property Owner' if not available
+  const getOwnerName = () => {
+    if (listing.owner) {
+      const { first_name, last_name } = listing.owner;
+      if (first_name || last_name) {
+        return `${first_name || ''} ${last_name || ''}`.trim();
+      }
+    }
+    return 'Property Owner';
+  };
+
+  // Get owner avatar from listing data, fallback to placeholder
+  const getOwnerAvatar = () => {
+    if (listing.owner?.profile_image) {
+      return listing.owner.profile_image;
+    }
+    return `https://i.pravatar.cc/150?u=${listing.owner_id}`;
+  };
+
   const owner = {
-    name: "Owner Name",
-    avatar: `https://i.pravatar.cc/150?u=${listing.ownerId}`
+    name: getOwnerName(),
+    avatar: getOwnerAvatar()
   };
 
   return (
@@ -45,7 +64,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, onViewDetails }) => 
         </div>
         
         <div className="flex items-center space-x-4 text-sm text-foreground-muted border-t border-border pt-3 mt-auto">
-            {listing.features.slice(0, 2).map((feature, i) => (
+            {listing.features?.slice(0, 2).map((feature, i) => (
                 <span key={i}>{feature}</span>
             ))}
         </div>
