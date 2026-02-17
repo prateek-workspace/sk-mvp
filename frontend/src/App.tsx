@@ -16,6 +16,8 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const BookingsPage = lazy(() => import('./pages/BookingsPage'));
 const ListingsPage = lazy(() => import('./pages/ListingsPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const RefundPolicyPage = lazy(() => import('./pages/RefundPolicyPage'));
 const ManageListingsPage = lazy(() => import('./pages/ManageListingsPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const OwnerDashboard = lazy(() => import('./pages/OwnerDashboard'));
@@ -82,6 +84,8 @@ function App() {
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/listings" element={<ListingsPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/refund-policy" element={<RefundPolicyPage />} />
 
                 {/* Protected routes */}
                 <Route element={<ProtectedRoute />}>

@@ -1,14 +1,12 @@
 {
-  "name": "student-prep-hub",
+  "name": "skstudentpath",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "lint:dualite": "eslint --config eslint.dualite.config.js .",
-    "tsc:dualite": "tsc -p tsconfig.dualite.json",
     "preview": "vite preview"
   },
   "dependencies": {

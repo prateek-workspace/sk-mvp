@@ -1,6 +1,19 @@
+# Student Prep Hub - Kanpur's #1 Student Services Platform
+# https://skstudentpath.com
 # https://www.robotstxt.org/robotstxt.html
+
+# Allow all search engines
 User-agent: *
 Allow: /
+
+# Core public pages - allow full crawling
+Allow: /listings
+Allow: /listings?category=*
+Allow: /listings?location=*
+Allow: /about
+Allow: /contact
+
+# Disallow private/authenticated areas
 Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /api/
@@ -8,10 +21,23 @@ Disallow: /login
 Disallow: /signup
 Disallow: /bookings
 Disallow: /manage-listings
+Disallow: /forgot-password
+Disallow: /verify
+Disallow: /*.json$
+Disallow: /*?*token=*
 
-# Allow important public pages
-Allow: /listings
-Allow: /listings?category=*
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
 
-# Sitemap
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Sitemap location
 Sitemap: https://skstudentpath.com/sitemap.xml
+
+# Host directive (for Yandex)
+Host: https://skstudentpath.com

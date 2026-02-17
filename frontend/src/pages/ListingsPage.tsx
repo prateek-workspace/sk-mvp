@@ -103,27 +103,49 @@ const ListingsPage: React.FC = () => {
     }
   }
 
-  const homepageSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Student Prep Hub",
-    "url": "https://alpha.dualite.dev",
-    "description": "India's largest online rental community for students",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://alpha.dualite.dev/listings?q={search_term_string}",
-      "query-input": "required name=search_term_string"
+  const getCategoryTitle = () => {
+    switch (category) {
+      case 'coaching': return 'Coaching Centers';
+      case 'library': return 'Libraries';
+      case 'pg': return 'Hostels & PGs';
+      case 'tiffin': return 'Tiffin Services';
+      default: return 'Student Services';
     }
+  };
+
+  const listingsPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `${getCategoryTitle()} in Kanpur`,
+    "description": `Find verified ${getCategoryTitle().toLowerCase()} in Kanpur, Uttar Pradesh. Best options near IIT Kanpur, CSJM University, HBTU.`,
+    "url": `https://skstudentpath.com/listings${category ? `?category=${category}` : ''}`,
+    "numberOfItems": filteredListings.length,
+    "itemListElement": currentListings.map((listing, index) => ({
+      "@type": "ListItem",
+      "position": (currentPage - 1) * LISTINGS_PER_PAGE + index + 1,
+      "item": {
+        "@type": "LocalBusiness",
+        "name": listing.name,
+        "description": listing.description,
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Kanpur",
+          "addressRegion": "Uttar Pradesh",
+          "addressCountry": "IN"
+        }
+      }
+    }))
   };
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Student Prep Hub - Find Best Coaching, PG, Hostels, Libraries & Tiffin Services"
-        description="Discover and book verified coaching centers, PG accommodations, hostels, tiffin services, and libraries across 30+ cities in India. Join 2000+ students on India's largest student rental platform."
-        keywords="coaching centers, PG accommodation, student hostels, tiffin services, libraries, student preparation, exam coaching, affordable PG, student rentals India"
-        canonical="https://alpha.dualite.dev/"
-        schemaMarkup={homepageSchema}
+        title={category ? `Best ${getCategoryTitle()} in Kanpur | Student Prep Hub` : 'All Student Services in Kanpur | Coaching, PG, Hostels, Libraries'}
+        description={category ? `Find top-rated ${getCategoryTitle().toLowerCase()} in Kanpur, UP. Verified listings near IIT Kanpur, CSJM University, HBTU. Compare prices, read reviews, book instantly.` : 'Discover verified coaching centers, PG accommodations, hostels, tiffin services & libraries in Kanpur. Kanpur\'s #1 student platform trusted by 2000+ students.'}
+        keywords={`${getCategoryTitle().toLowerCase()} Kanpur, ${getCategoryTitle().toLowerCase()} near IIT Kanpur, best ${getCategoryTitle().toLowerCase()} Kanpur, affordable ${getCategoryTitle().toLowerCase()} Kanpur, ${getCategoryTitle().toLowerCase()} Kidwai Nagar, ${getCategoryTitle().toLowerCase()} Kakadeo, student services Kanpur UP`}
+        canonical={`https://skstudentpath.com/listings${category ? `?category=${category}` : ''}`}
+        schemaMarkup={listingsPageSchema}
+        category={getCategoryTitle()}
       />
       <Navbar />
 
@@ -170,11 +192,18 @@ const ListingsPage: React.FC = () => {
         </div>
       </main>
 
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
-        <div className="max-w-screen-xl mx-auto text-center">
-          <p className="text-foreground-muted">
-            © 2025 Student Prep Hub. All rights reserved.
-          </p>
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border bg-surface">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-foreground-muted text-sm">
+              © 2026 SkStudentPath. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6 text-sm">
+              <a href="mailto:info@skstudentpath.com" className="text-foreground-muted hover:text-primary transition-colors">info@skstudentpath.com</a>
+              <Link to="/privacy-policy" className="text-foreground-muted hover:text-primary transition-colors">Privacy Policy</Link>
+              <Link to="/refund-policy" className="text-foreground-muted hover:text-primary transition-colors">Refund Policy</Link>
+            </div>
+          </div>
         </div>
       </footer>
 

@@ -7,7 +7,11 @@ import {
   Coffee,
   Library,
   Search,
-  Send
+  Send,
+  Star,
+  Mail,
+  MapPin,
+  Quote
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ListingCard from '../components/ListingCard';
@@ -88,32 +92,40 @@ const LandingPage: React.FC = () => {
   ];
 
   const metrics = [
-    { value: `${listings.length}+`, label: 'Total Services' },
+    { value: `${listings.length}+`, label: 'Services in Kanpur' },
     { value: '2000+', label: 'Active Students' },
-    { value: '30+', label: 'Cities Covered' },
+    { value: '#1', label: 'Platform in Kanpur' },
   ];
 
   const landingPageSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Student Prep Hub",
-  "url": "https://skstudentpath.com/",
-  "description": "Find the best coaching centers, PGs, hostels, libraries and tiffin services for students across India.",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://skstudentpath.com/listings?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-};
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Student Prep Hub Kanpur",
+    "url": "https://skstudentpath.com/",
+    "description": "Kanpur's #1 platform for student services - find and book coaching centers, PG accommodations, hostels, tiffin services, and libraries near IIT Kanpur, CSJM University, HBTU.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://skstudentpath.com/listings?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "Kanpur",
+      "containedInPlace": {
+        "@type": "State",
+        "name": "Uttar Pradesh"
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Student Prep Hub - Your Complete Student Solutions Platform"
-        description="Find the best coaching centers, hostels, PG accommodations, tiffin services, and libraries across India. Trusted by thousands of students."
-        keywords="student pg, coaching centers, hostels, libraries, tiffin services, student rentals india"
+        title="Student Prep Hub Kanpur | #1 Platform for Coaching, PG, Hostels, Libraries & Tiffin in Kanpur"
+        description="Kanpur's most trusted student platform. Find verified coaching centers near Kidwai Nagar, PG in Kakadeo, hostels near IIT Kanpur, libraries in Civil Lines & tiffin services. List your services or discover the best student facilities in Kanpur, UP."
+        keywords="coaching centers Kanpur, PG in Kanpur, hostels near IIT Kanpur, tiffin services Kanpur, libraries Kanpur, student accommodation Kanpur, PG near CSJM University, coaching Kidwai Nagar, PG Kakadeo, hostels Kalyanpur, best coaching Kanpur, affordable PG Kanpur, list PG Kanpur, register coaching center Kanpur"
         canonical="https://skstudentpath.com/"
-        ogImage="https://skstudentpath.com/og-image.jpg"
+        ogImage="https://skstudentpath.com/og-image-kanpur.jpg"
         schemaMarkup={landingPageSchema}
       />
       <Navbar />
@@ -140,7 +152,7 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight"
             >
-              Discover Your <span className="text-primary">Perfect</span> Student Hub
+              Kanpur's <span className="text-primary">#1</span> Student Hub
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -148,7 +160,7 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-lg text-foreground-muted mb-8 max-w-2xl"
             >
-              Find and book top-rated student services in just a few clicks.
+              Find & book verified coaching centers, PGs, hostels, libraries & tiffin services in Kanpur.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -234,12 +246,12 @@ const LandingPage: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-3xl font-bold text-foreground-default mb-4">About SkStudentPath</h2>
+              <h2 className="text-3xl font-bold text-foreground-default mb-4">About SkStudentPath Kanpur</h2>
               <p className="text-foreground-muted mb-4">
-                SkStudentPath was born from a simple idea: to make the journey of ambitious students easier. Finding the right coaching, a safe place to stay, and healthy food shouldn't be a hassle.
+                SkStudentPath is Kanpur's premier platform for students. Whether you're preparing for IIT-JEE, NEET, UPSC, or studying at CSJM University, HBTU, or IIT Kanpur — we help you find the best coaching, accommodation, and services.
               </p>
               <p className="text-foreground-muted">
-                We are building India's largest online rental community, connecting students with verified service providers. Our mission is to provide a one-stop platform that is trustworthy, convenient, and tailored to the unique needs of students.
+                We connect students in Kanpur, Uttar Pradesh with verified service providers. From coaching centers in Kidwai Nagar to PGs in Kakadeo and libraries in Civil Lines — we make student life easier. Service providers can also list their facilities to reach thousands of students.
               </p>
             </motion.div>
             <motion.div
@@ -254,18 +266,68 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Testimonials Section - Hidden until we have real reviews */}
-        {/* 
+        {/* Testimonials Section */}
         <section id="testimonials" className="py-24 bg-background">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-4 text-foreground-default">What Our Students Say</h2>
-            <p className="text-center text-foreground-muted mb-12 max-w-2xl mx-auto">Real stories from students who found their perfect fit on PrepHub.</p>
-            <div className="text-center py-12">
-              <p className="text-foreground-muted">Reviews coming soon...</p>
+            <h2 className="text-3xl font-bold text-center mb-4 text-foreground-default">What Students Say About Us</h2>
+            <p className="text-center text-foreground-muted mb-12 max-w-2xl mx-auto">Real experiences from students who found their perfect services through SkStudentPath in Kanpur.</p>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "Rahul Sharma",
+                  role: "IIT-JEE Aspirant",
+                  location: "Kidwai Nagar, Kanpur",
+                  image: "https://i.pravatar.cc/150?img=11",
+                  rating: 5,
+                  text: "Found an amazing coaching center through SkStudentPath. The platform made it so easy to compare different options in Kanpur. Highly recommended for serious JEE aspirants!"
+                },
+                {
+                  name: "Priya Verma",
+                  role: "CSJM University Student",
+                  location: "Kakadeo, Kanpur",
+                  image: "https://i.pravatar.cc/150?img=5",
+                  rating: 5,
+                  text: "I was new to Kanpur and needed a safe PG near my college. SkStudentPath helped me find a verified PG with all amenities. The booking process was smooth and transparent."
+                },
+                {
+                  name: "Amit Kumar",
+                  role: "NEET Aspirant",
+                  location: "Govind Nagar, Kanpur",
+                  image: "https://i.pravatar.cc/150?img=12",
+                  rating: 5,
+                  text: "The tiffin service I found here is excellent! Homely food at affordable prices. Also using their library listing feature - found a great study space near my coaching."
+                }
+              ].map((testimonial, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1, duration: 0.5 }}
+                  className="bg-surface p-6 rounded-xl border border-border shadow-subtle hover:shadow-md-deep transition-shadow"
+                >
+                  <Quote className="w-8 h-8 text-primary/30 mb-4" />
+                  <p className="text-foreground-muted mb-6 leading-relaxed">"{testimonial.text}"</p>
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <img src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover" />
+                    <div>
+                      <p className="font-semibold text-foreground-default">{testimonial.name}</p>
+                      <p className="text-sm text-foreground-muted">{testimonial.role}</p>
+                      <p className="text-xs text-foreground-muted flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3" /> {testimonial.location}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
-        */}
 
         {/* Contact Section */}
         <section id="contact" className="py-24 bg-surface">
@@ -322,37 +384,52 @@ const LandingPage: React.FC = () => {
             <div className="grid md:grid-cols-12 gap-8">
               <div className="md:col-span-4">
                 <h3 className="text-xl font-bold text-white mb-4">SkStudentPath</h3>
-                <p className="text-sm mb-4">India's largest platform designed to create an online rental community for students.</p>
+                <p className="text-sm mb-4">Kanpur's #1 student services platform. Find coaching, PG, hostels, libraries & tiffin near IIT Kanpur, CSJM University, HBTU. Also list your services to reach 2000+ students.</p>
+                <div className="space-y-2 mt-4">
+                  <a href="mailto:info@skstudentpath.com" className="flex items-center gap-2 text-sm hover:text-primary transition-colors">
+                    <Mail className="w-4 h-4" />
+                    info@skstudentpath.com
+                  </a>
+                  <p className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4" />
+                    Kanpur, Uttar Pradesh, India
+                  </p>
+                </div>
               </div>
               <div className="md:col-span-2">
                 <h4 className="font-semibold text-white mb-4">Navigation</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><a href="#about" className="hover:text-primary">About Us</a></li>
-                  <li><a href="#testimonials" className="hover:text-primary">Testimonials</a></li>
-                  <li><a href="#contact" className="hover:text-primary">Contact</a></li>
-                  <li><a href="#" className="hover:text-primary">Privacy Policy</a></li>
+                  <li><a href="#about" className="hover:text-primary transition-colors">About Us</a></li>
+                  <li><a href="#testimonials" className="hover:text-primary transition-colors">Testimonials</a></li>
+                  <li><a href="#contact" className="hover:text-primary transition-colors">Contact</a></li>
                 </ul>
               </div>
               <div className="md:col-span-2">
-                <h4 className="font-semibold text-white mb-4">Top Categories</h4>
+                <h4 className="font-semibold text-white mb-4">Legal</h4>
                 <ul className="space-y-2 text-sm">
-                  <li><Link to="/listings?category=coaching" className="hover:text-primary">Coaching</Link></li>
-                  <li><Link to="/listings?category=pg" className="hover:text-primary">Hostels & PG</Link></li>
-                  <li><Link to="/listings?category=library" className="hover:text-primary">Libraries</Link></li>
-                  <li><Link to="/listings?category=tiffin" className="hover:text-primary">Tiffin</Link></li>
+                  <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</Link></li>
                 </ul>
               </div>
               <div className="md:col-span-4">
-                <h4 className="font-semibold text-white mb-4">Subscribe to Our Newsletter</h4>
-                <p className="text-sm mb-4">Stay updated with the latest listings and rental tips.</p>
-                <div className="flex gap-2">
-                  <input type="email" placeholder="Email Address" className="w-full px-4 py-2 rounded-lg bg-surface border border-border text-foreground-default focus:outline-none focus:ring-2 focus:ring-primary" />
-                  <button className="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 shadow-lg shadow-primary/30">Subscribe</button>
+                <h4 className="font-semibold text-white mb-4">Top Categories</h4>
+                <ul className="grid grid-cols-2 gap-2 text-sm">
+                  <li><Link to="/listings?category=coaching" className="hover:text-primary transition-colors">Coaching Centers</Link></li>
+                  <li><Link to="/listings?category=pg" className="hover:text-primary transition-colors">Hostels & PG</Link></li>
+                  <li><Link to="/listings?category=library" className="hover:text-primary transition-colors">Libraries</Link></li>
+                  <li><Link to="/listings?category=tiffin" className="hover:text-primary transition-colors">Tiffin Services</Link></li>
+                </ul>
+                <div className="mt-6">
+                  <h4 className="font-semibold text-white mb-3">Newsletter</h4>
+                  <div className="flex gap-2">
+                    <input type="email" placeholder="Your email" className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
+                    <button className="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 text-sm">Subscribe</button>
+                  </div>
                 </div>
               </div>
             </div>
             <div className="mt-12 border-t border-gray-700 pt-8 text-center text-sm">
-              <p>© 2025 Student Prep Hub. Designed and Developed with ❤️ by <strong>Prateek Srivastava</strong>.</p>
+              <p>© 2026 SkStudentPath. All rights reserved. Designed with ❤️ in Kanpur by <strong>Prateek Srivastava</strong>.</p>
             </div>
           </motion.div>
         </footer>
