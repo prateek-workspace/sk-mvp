@@ -382,7 +382,7 @@ const LandingPage: React.FC = () => {
             className="max-w-screen-xl mx-auto py-16 px-4 sm:px-6 lg:px-8"
           >
             <div className="grid md:grid-cols-12 gap-8">
-              <div className="md:col-span-4">
+              <div className="md:col-span-3">
                 <h3 className="text-xl font-bold text-white mb-4">SkStudentPath</h3>
                 <p className="text-sm mb-4">Kanpur's #1 student services platform. Find coaching, PG, hostels, libraries & tiffin near IIT Kanpur, CSJM University, HBTU. Also list your services to reach 2000+ students.</p>
                 <div className="space-y-2 mt-4">
@@ -397,11 +397,12 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
               <div className="md:col-span-2">
-                <h4 className="font-semibold text-white mb-4">Navigation</h4>
+                <h4 className="font-semibold text-white mb-4">Quick Links</h4>
                 <ul className="space-y-2 text-sm">
                   <li><a href="#about" className="hover:text-primary transition-colors">About Us</a></li>
                   <li><a href="#testimonials" className="hover:text-primary transition-colors">Testimonials</a></li>
                   <li><a href="#contact" className="hover:text-primary transition-colors">Contact</a></li>
+                  <li><a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Sitemap</a></li>
                 </ul>
               </div>
               <div className="md:col-span-2">
@@ -411,20 +412,28 @@ const LandingPage: React.FC = () => {
                   <li><Link to="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</Link></li>
                 </ul>
               </div>
-              <div className="md:col-span-4">
-                <h4 className="font-semibold text-white mb-4">Top Categories</h4>
-                <ul className="grid grid-cols-2 gap-2 text-sm">
-                  <li><Link to="/listings?category=coaching" className="hover:text-primary transition-colors">Coaching Centers</Link></li>
-                  <li><Link to="/listings?category=pg" className="hover:text-primary transition-colors">Hostels & PG</Link></li>
-                  <li><Link to="/listings?category=library" className="hover:text-primary transition-colors">Libraries</Link></li>
-                  <li><Link to="/listings?category=tiffin" className="hover:text-primary transition-colors">Tiffin Services</Link></li>
+              <div className="md:col-span-2">
+                <h4 className="font-semibold text-white mb-4">Popular Areas</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><Link to="/listings?location=kakadeo" className="hover:text-primary transition-colors">Kakadeo</Link></li>
+                  <li><Link to="/listings?location=kidwai-nagar" className="hover:text-primary transition-colors">Kidwai Nagar</Link></li>
+                  <li><Link to="/listings?location=kalyanpur" className="hover:text-primary transition-colors">Kalyanpur</Link></li>
+                  <li><Link to="/listings?location=govind-nagar" className="hover:text-primary transition-colors">Govind Nagar</Link></li>
+                  <li><Link to="/listings?location=civil-lines" className="hover:text-primary transition-colors">Civil Lines</Link></li>
                 </ul>
-                <div className="mt-6">
-                  <h4 className="font-semibold text-white mb-3">Newsletter</h4>
-                  <div className="flex gap-2">
-                    <input type="email" placeholder="Your email" className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
-                    <button className="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 text-sm">Subscribe</button>
-                  </div>
+              </div>
+              <div className="md:col-span-3">
+                <h4 className="font-semibold text-white mb-4">Categories</h4>
+                <ul className="grid grid-cols-1 gap-2 text-sm mb-4">
+                  <li><Link to="/listings?category=coaching" className="hover:text-primary transition-colors">Coaching Centers in Kanpur</Link></li>
+                  <li><Link to="/listings?category=pg" className="hover:text-primary transition-colors">PG & Hostels in Kanpur</Link></li>
+                  <li><Link to="/listings?category=library" className="hover:text-primary transition-colors">Libraries in Kanpur</Link></li>
+                  <li><Link to="/listings?category=tiffin" className="hover:text-primary transition-colors">Tiffin Services in Kanpur</Link></li>
+                </ul>
+                <h4 className="font-semibold text-white mb-3">Newsletter</h4>
+                <div className="flex gap-2">
+                  <input type="email" placeholder="Your email" className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
+                  <button className="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-rose-600 text-sm">Subscribe</button>
                 </div>
               </div>
             </div>

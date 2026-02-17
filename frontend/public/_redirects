@@ -1,0 +1,12 @@
+# Cloudflare Pages Redirects Configuration
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+# SPA fallback - React Router support
+# All routes serve index.html for client-side routing
+/*    /index.html   200
+
+# SEO redirects for common variations
+/home     /   301
+/index    /   301
+
+# Canonical URL redirects (www to non-www handled in Cloudflare DNS)

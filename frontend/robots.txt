@@ -1,17 +1,20 @@
-# Student Prep Hub - Kanpur's #1 Student Services Platform
+# SkStudentPath - Kanpur's #1 Student Services Platform
 # https://skstudentpath.com
+# Find Coaching, PG, Hostels, Libraries & Tiffin in Kanpur, UP
 # https://www.robotstxt.org/robotstxt.html
 
 # Allow all search engines
 User-agent: *
 Allow: /
-
-# Core public pages - allow full crawling
 Allow: /listings
-Allow: /listings?category=*
+Allow: /listings?category=coaching
+Allow: /listings?category=pg
+Allow: /listings?category=hostel
+Allow: /listings?category=library
+Allow: /listings?category=tiffin
 Allow: /listings?location=*
-Allow: /about
-Allow: /contact
+Allow: /privacy-policy
+Allow: /refund-policy
 
 # Disallow private/authenticated areas
 Disallow: /dashboard/
@@ -25,19 +28,38 @@ Disallow: /forgot-password
 Disallow: /verify
 Disallow: /*.json$
 Disallow: /*?*token=*
+Disallow: /*?*session=*
+Disallow: /assets/
 
-# Google specific
+# Google specific - prioritize for local search
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
+
+# Google Images
+User-agent: Googlebot-Image
+Allow: /
 
 # Bing specific
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 2
 
-# Sitemap location
+# Yandex specific
+User-agent: Yandex
+Allow: /
+Crawl-delay: 3
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Sitemap locations
 Sitemap: https://skstudentpath.com/sitemap.xml
 
-# Host directive (for Yandex)
+# Host directive (for Yandex and some crawlers)
 Host: https://skstudentpath.com
+
+# Additional files
+# humans.txt: https://skstudentpath.com/humans.txt
+# security.txt: https://skstudentpath.com/security.txt

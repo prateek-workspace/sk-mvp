@@ -1,0 +1,23 @@
+/* TEAM */
+Developer: Prateek Srivastava
+Site: https://skstudentpath.com
+Location: Kanpur, Uttar Pradesh, India
+
+/* SITE */
+Name: SkStudentPath
+Description: Kanpur's #1 Student Services Platform
+Standards: HTML5, CSS3, React, TypeScript
+Components: Coaching Centers, PG Accommodations, Hostels, Libraries, Tiffin Services
+Software: Vite, React, TailwindCSS, FastAPI
+
+/* LOCATION */
+City: Kanpur
+State: Uttar Pradesh
+Country: India
+Pincode: 208001-208027
+
+/* SERVING AREAS */
+Kakadeo, Kidwai Nagar, Govind Nagar, Kalyanpur, Civil Lines, 
+Swaroop Nagar, Harsh Nagar, Shastri Nagar, Rawatpur, Nawabganj,
+Tilak Nagar, Ashok Nagar, Arya Nagar, Near IIT Kanpur, 
+Near CSJM University, Near HBTU, Near GSVM Medical College

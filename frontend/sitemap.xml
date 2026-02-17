@@ -19,7 +19,7 @@
     <priority>0.95</priority>
   </url>
   
-  <!-- Coaching Centers in Kanpur -->
+  <!-- Category Pages - High Priority -->
   <url>
     <loc>https://skstudentpath.com/listings?category=coaching</loc>
     <lastmod>2026-02-17</lastmod>
@@ -27,7 +27,6 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- PG Accommodation in Kanpur -->
   <url>
     <loc>https://skstudentpath.com/listings?category=pg</loc>
     <lastmod>2026-02-17</lastmod>
@@ -35,7 +34,6 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- Libraries in Kanpur -->
   <url>
     <loc>https://skstudentpath.com/listings?category=library</loc>
     <lastmod>2026-02-17</lastmod>
@@ -43,7 +41,6 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- Tiffin Services in Kanpur -->
   <url>
     <loc>https://skstudentpath.com/listings?category=tiffin</loc>
     <lastmod>2026-02-17</lastmod>
@@ -51,7 +48,6 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- Hostels in Kanpur -->
   <url>
     <loc>https://skstudentpath.com/listings?category=hostel</loc>
     <lastmod>2026-02-17</lastmod>
@@ -59,16 +55,44 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- Location-specific pages for Kanpur areas -->
+  <!-- Popular Kanpur Areas -->
   <url>
     <loc>https://skstudentpath.com/listings?location=kakadeo</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   
   <url>
     <loc>https://skstudentpath.com/listings?location=kidwai-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=kalyanpur</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=govind-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=civil-lines</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=swaroop-nagar</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -82,38 +106,139 @@
   </url>
   
   <url>
-    <loc>https://skstudentpath.com/listings?location=govind-nagar</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://skstudentpath.com/listings?location=swaroop-nagar</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://skstudentpath.com/listings?location=kalyanpur</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://skstudentpath.com/listings?location=civil-lines</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
     <loc>https://skstudentpath.com/listings?location=shastri-nagar</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=rawatpur</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=nawabganj</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=tilak-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=ashok-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=arya-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Near Colleges/Universities -->
+  <url>
+    <loc>https://skstudentpath.com/listings?location=iit-kanpur</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=csjm-university</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=hbtu</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?location=gsvm-medical-college</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Category + Location Combined (High-value pages) -->
+  <url>
+    <loc>https://skstudentpath.com/listings?category=pg&amp;location=kakadeo</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?category=coaching&amp;location=kidwai-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?category=hostel&amp;location=kalyanpur</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?category=tiffin&amp;location=govind-nagar</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?category=library&amp;location=civil-lines</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?category=pg&amp;location=iit-kanpur</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/listings?category=hostel&amp;location=csjm-university</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  
+  <!-- Legal Pages -->
+  <url>
+    <loc>https://skstudentpath.com/privacy-policy</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://skstudentpath.com/refund-policy</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
   
   <!-- For Business Owners / Listers -->
@@ -122,21 +247,6 @@
     <lastmod>2026-02-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-  </url>
-  
-  <!-- About & Contact -->
-  <url>
-    <loc>https://skstudentpath.com/about</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://skstudentpath.com/contact</loc>
-    <lastmod>2026-02-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
   
 </urlset>

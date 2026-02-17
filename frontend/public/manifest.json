@@ -1,7 +1,7 @@
 {
-  "name": "Student Prep Hub Kanpur",
-  "short_name": "StudentPrepHub",
-  "description": "Kanpur's #1 platform for student services - coaching centers, PG, hostels, libraries & tiffin services near IIT Kanpur, CSJM University, HBTU",
+  "name": "SkStudentPath - Kanpur's #1 Student Services",
+  "short_name": "SkStudentPath",
+  "description": "Kanpur's #1 platform for student services - Find coaching centers in Kidwai Nagar, PG in Kakadeo, hostels near IIT Kanpur & CSJM, libraries in Civil Lines, tiffin services in Govind Nagar. List your services FREE!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -11,20 +11,66 @@
   "lang": "en-IN",
   "icons": [
     {
-      "src": "https://i.ibb.co/HLfD5wgf/dualite-favicon.png",
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.ibb.co/HLfD5wgf/dualite-favicon.png",
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "lifestyle", "utilities"],
+  "categories": ["education", "lifestyle", "utilities", "productivity"],
   "screenshots": [],
   "related_applications": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Find Coaching Centers",
+      "short_name": "Coaching",
+      "description": "Browse coaching centers in Kanpur",
+      "url": "/listings?category=coaching",
+      "icons": [{"src": "/icons/coaching-icon.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Find PG & Hostels",
+      "short_name": "PG/Hostels",
+      "description": "Browse PG and hostels in Kanpur",
+      "url": "/listings?category=pg",
+      "icons": [{"src": "/icons/pg-icon.png", "sizes": "96x96"}]
+    }
+  ]
 }
