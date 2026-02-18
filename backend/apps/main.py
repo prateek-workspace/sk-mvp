@@ -18,15 +18,12 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://sk-mvp.pages.dev",
-        "https://skstudentpath.com",
-        "https://www.skstudentpath.com",
-        "https://sk-mvp-615.pages.dev",
-        "http://localhost:5173",          # Vite dev server
-        "http://localhost:3000",          # Alternative dev port
+        "http://localhost:5173",
+        "http://localhost:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
     ],
+    allow_origin_regex=r"https://(.*\.)?skstudentpath\.com|https://sk-mvp.*\.pages\.dev",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
